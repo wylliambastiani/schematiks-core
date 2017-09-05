@@ -54,7 +54,7 @@ function MSSQLDatabaseMapperDao(connectionSettings) {
     this.getTables = async function() {
         let result = await getDatabaseObject('select_all_database_tables');
         return result.recordset.map(row => {
-            return new Table(row.table_id, row.table_name, row.table_create_date, row.table_modify_date, row.schema_id);
+            return new Table(row.table_id, row.table_name, row.table_create_date, row.table_modify_date, row.schema_id, row.hasData);
         }); 
     }
 

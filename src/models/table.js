@@ -1,13 +1,14 @@
 
 'use strict';
 
-function Table(id, name, createDate, modifyDate, schemaId) {
+function Table(id, name, createDate, modifyDate, schemaId, hasData) {
     this.id = id;
     this.name = name;
     this.createDate = createDate;
     this.modifyDate = modifyDate;
     this.schemaId = schemaId;
     this.schema = null;
+    this.hasData = hasData;
     this.columns = [];
 
     Object.defineProperty(this, 'fullName', {
