@@ -1,0 +1,23 @@
+{
+  "name": "schematiks-core",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test test/**/*_test.js --recursive -R spec"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^3.5.0",
+    "mssql": "^4.0.4",
+    "rootpath": "^0.1.2",
+    "sinon": "^3.2.1",
+    "string": "^3.3.3",
+    "underscore": "^1.8.3"
+  }
+}
