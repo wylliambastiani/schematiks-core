@@ -313,6 +313,8 @@ function DatabaseMapComparer (previousDatabaseMap, currentDatabaseMap) {
     this.compare = function compare() {
         compareSchemas();
         compareTables();
+
+        return this.databaseMapDiff;
     }
 }
 
