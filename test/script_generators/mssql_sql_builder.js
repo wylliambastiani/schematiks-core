@@ -13,14 +13,14 @@ const MSSQLServerSqlBuilder = require('src/script_generators/mssql_sql_builder')
 
 describe('MSSQLServerSqlBuilder', function () {
 
-    describe('createUseStmt', function () {
+    describe('generateUseStmt', function () {
 
         it('should return \'use database\' statement ', function() {
             // Arrange
             let builder = new MSSQLServerSqlBuilder(DatabaseType.MSSQL_2016);
             
             // Act
-            let script = builder.createUseStmt('TestDB').toString();
+            let script = builder.generateUseStmt('TestDB').toString();
 
             // Assert
             expect(script).to.contain('USE TestDB;');
@@ -38,7 +38,7 @@ describe('MSSQLServerSqlBuilder', function () {
                 let builder = new MSSQLServerSqlBuilder(DatabaseType.MSSQL_2016);
     
                 // Act + Assert
-                let fun = function() { builder.createUseStmt(testCase.args).toString(); };
+                let fun = function() { builder.generateUseStmt(testCase.args).toString(); };
                 expect(fun).to.throw(Error);
             });
         });
