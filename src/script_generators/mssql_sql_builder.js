@@ -10,6 +10,10 @@ function MSSQLServerSqlBuilder(databaseType) {
     let _script = '';
 
     this.createUseStmt = function (databaseName) {
+        if (!databaseName) {
+            throw new Error(`Invalid database name: ${databaseName}`);
+        }
+        
         let script = _scriptLoader.getScript('use_stmt');
         script = script.replace('{DatabaseName}', databaseName);
         script.replace()
