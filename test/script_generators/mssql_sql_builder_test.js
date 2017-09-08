@@ -43,4 +43,15 @@ describe('MSSQLServerSqlBuilder', function () {
             });
         });
     });
+
+    describe('generateDropTableStmt', function() {
+
+        it('should return empty script if no tables has been dropped', function() {
+            // Arrange
+            
+            // Act
+
+            // Assert
+        });
+    });
 });

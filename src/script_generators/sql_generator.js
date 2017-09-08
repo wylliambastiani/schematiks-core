@@ -9,7 +9,7 @@ function SqlGenerator(sqlBuilder) {
     this.generate = function(diff) {
         let databaseName = diff.currentDatabaseMap.databaseName || diff.previousDatabaseMap.databaseName;
 
-        _builder = _builder.createUseStmt(databaseName);
+        _builder = _builder.generateUseStmt(databaseName);
 
         return _builder.toString();
     }
