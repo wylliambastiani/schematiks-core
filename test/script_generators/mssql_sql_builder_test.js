@@ -42,7 +42,7 @@ describe('MSSQLServerSqlBuilder', function () {
                 let builder = new MSSQLServerSqlBuilder(DatabaseType.MSSQL_2016);
     
                 // Act + Assert
-                let fun = function() { builder.generateUseStmt(testCase.args).toString(); };
+                let fun = function() { builder.generateUseStmt(testCase.args); };
                 expect(fun).to.throw(Error);
             });
         });
@@ -67,8 +67,19 @@ describe('MSSQLServerSqlBuilder', function () {
             });
         });
 
-        // let schema = new Schema(1, 'dbo');
-        // let table = new Table(2, 'DroppedTable', new Date(2017, 1, 1), new Date(2017, 1, 1),
-        //     schema.id, false);
+        it('drop empty table should return simple drop script', function() {
+            // Arrange
+            let schema = new Schema(1, 'dbo');
+            let table = new Table(2, 'DroppedTable', new Date(2017, 1, 1), new Date(2017, 1, 1), 1, false);
+            table.schema = schema;
+
+            let builder = new MSSQLServerSqlBuilder(DatabaseType.MSSQL_2016);
+
+            // Act
+            let script = builder.generateDropTableStmt(table);
+
+            // Assert
+            expect(script).to.contains('DROP TABLE dbo.DroppedTable');
+        });
     });
 });

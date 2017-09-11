@@ -7,7 +7,6 @@ const ScriptLoader = require('src/script_loader');
 function MSSQLServerSqlBuilder(databaseType) {
     let _databaseType = databaseType;
     let _scriptLoader = new ScriptLoader(_databaseType);
-    let _script = '';
 
     this.generateUseStmt = function(databaseName) {
         if (!databaseName) {
@@ -16,19 +15,20 @@ function MSSQLServerSqlBuilder(databaseType) {
 
         let script = _scriptLoader.getScript('use_stmt');
         script = script.replace('{DatabaseName}', databaseName);
-        _script += '\n' + script;
 
-        return this;
+        return '\n' + script + '\n';
     }
 
     this.generateDropTableStmt = function(table) {
         if (!table) {
             throw new Error(`Invalid table value: ${table}`);
         }
-    }
 
-    this.toString = function () {
-        return _script;
+        let script = _scriptLoader.getScript('drop_table_stmt');
+        script = script.replace('{SchemaName}', table.schema.name)
+                       .replace('{TableName}', table.name);
+        
+        return '\n' + script + '\n';
     }
 }
 
