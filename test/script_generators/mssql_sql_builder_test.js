@@ -166,8 +166,7 @@ describe('MSSQLServerSqlBuilder', function () {
             });
         });
 
-
-        it('should return column definition for int - no identity', function() {
+        it('should return column definition for type: INT, IsNullable: FALSE', function() {
             // Arrange
             let builder = new MSSQLServerSqlBuilder(DatabaseType.MSSQL_2016);
             let column = new Column(1, 'ColumnName', 'int', 4, 10, 0, null, false, false, null, null, false, null);
