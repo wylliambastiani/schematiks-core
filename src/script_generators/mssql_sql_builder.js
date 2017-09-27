@@ -70,6 +70,8 @@ function MSSQLServerSqlBuilder(databaseType) {
 
         if (!column.isNullable) {
             script = script.replace('{IsNullable}', 'NOT NULL');
+        } else {
+            script = script.replace('{IsNullable}', 'NULL');
         }
 
         return script;

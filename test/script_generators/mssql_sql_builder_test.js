@@ -177,6 +177,18 @@ describe('MSSQLServerSqlBuilder', function () {
             // Assert
             expect(script).to.contains('ColumnName INT NOT NULL');
         });
+
+        it('should return column definition for type: INT, IsNullable: TRUE', function() {
+            // Arrange
+            let builder = new MSSQLServerSqlBuilder(DatabaseType.MSSQL_2016);
+            let column = new Column(1, 'ColumnName', 'int', 4, 10, 0, null, true, false, null, null, false, null);
+
+            // Act
+            let script = builder.generateCreateTableColumnStmt(column);
+
+            // Assert
+            expect(script).to.contains('ColumnName INT NULL');
+        });
     });
 
     /*
