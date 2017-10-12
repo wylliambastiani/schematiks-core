@@ -178,7 +178,17 @@ describe('MSSQLServerSqlBuilder', function () {
             {type: 'bigint', precision: null, scale: null, isNullable: false, expectedResult: 'ColumnName BIGINT NOT NULL'},
             {type: 'bigint', precision: null, scale: null, isNullable: true, expectedResult: 'ColumnName BIGINT NULL'},
             {type: 'decimal', precision: 5, scale: 2, isNullable: false, expectedResult: 'ColumnName DECIMAL(5,2) NOT NULL'},
-            {type: 'decimal', precision: 5, scale: 2, isNullable: true, expectedResult: 'ColumnName DECIMAL(5,2) NULL'}
+            {type: 'decimal', precision: 5, scale: 2, isNullable: true, expectedResult: 'ColumnName DECIMAL(5,2) NULL'},
+            {type: 'money', precision: null, scale: null, isNullable: false, expectedResult: 'ColumnName MONEY NOT NULL'},
+            {type: 'money', precision: null, scale: null, isNullable: true, expectedResult: 'ColumnName MONEY NULL'},
+            {type: 'smallmoney', precision: null, scale: null, isNullable: false, expectedResult: 'ColumnName SMALLMONEY NOT NULL'},
+            {type: 'smallmoney', precision: null, scale: null, isNullable: true, expectedResult: 'ColumnName SMALLMONEY NULL'},
+            {type: 'numeric', precision: 5, scale: 2, isNullable: false, expectedResult: 'ColumnName NUMERIC(5,2) NOT NULL'},
+            {type: 'numeric', precision: 5, scale: 2, isNullable: true, expectedResult: 'ColumnName NUMERIC(5,2) NULL'},
+            {type: 'float', precision: 24, scale: 0, isNullable: false, expectedResult: 'ColumnName FLOAT(24) NOT NULL'},
+            {type: 'float', precision: 24, scale: 0, isNullable: true, expectedResult: 'ColumnName FLOAT(24) NULL'},
+            {type: 'real', precision: 24, scale: 0, isNullable: false, expectedResult: 'ColumnName REAL(24) NOT NULL'},
+            {type: 'real', precision: 24, scale: 0, isNullable: true, expectedResult: 'ColumnName REAL(24) NULL'}
         ];
 
         typesCases.forEach(typeCase => {

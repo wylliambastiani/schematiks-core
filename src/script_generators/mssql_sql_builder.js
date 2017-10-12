@@ -10,7 +10,10 @@ function MSSQLServerSqlBuilder(databaseType) {
     let _scriptLoader = new ScriptLoader(_databaseType);
     
     let _columnTypePlaceholderReplacers = {
-        'decimal': columnDecimalPlaceholderReplacer
+        'decimal': columnDecimalPlaceholderReplacer,
+        'numeric': columnNumericPlaceholderReplacer,
+        'float': columnFloatPlaceholderReplacer,
+        'real': columnRealPlaceholderReplacer
     }
 
     function wrapInNewLine(script) {
@@ -38,9 +41,29 @@ function MSSQLServerSqlBuilder(databaseType) {
         return script
     }
 
-    function columnDecimalPlaceholderReplacer(script, column) {
+    function columnNumericOrDecimalPlaceHolderReplacer(script, column) {
         script = script.replace('{PrecisionAndScale}', `(${column.typePrecision},${column.typeScale})`);
         return script;
+    }
+
+    function columnDecimalPlaceholderReplacer(script, column) {
+        return columnNumericOrDecimalPlaceHolderReplacer(script, column)
+    }
+
+    function columnNumericPlaceholderReplacer(script, column){
+        return columnNumericOrDecimalPlaceHolderReplacer(script, column)
+    }
+
+    function columnFloatOrRealPlaceholderReplacer(script, column) {
+        return script.replace('{PrecisionAndScale}', `(${column.typePrecision})`);
+    }
+
+    function columnFloatPlaceholderReplacer(script, column) {
+        return columnFloatOrRealPlaceholderReplacer(script, column);
+    }
+
+    function columnRealPlaceholderReplacer(script, column) {
+        return columnFloatOrRealPlaceholderReplacer(script, column);
     }
 
     this.generateUseStmt = function(databaseName) {
