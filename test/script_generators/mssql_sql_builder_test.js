@@ -166,28 +166,33 @@ describe('MSSQLServerSqlBuilder', function () {
             });
         });
 
-        it('should return column definition for type: INT, IsNullable: FALSE', function() {
-            // Arrange
-            let builder = new MSSQLServerSqlBuilder(DatabaseType.MSSQL_2016);
-            let column = new Column(1, 'ColumnName', 'int', 4, 10, 0, null, false, false, null, null, false, null);
+        let typesCases = [
+            {type: 'int', precision: null, scale: null, isNullable: false, expectedResult: 'ColumnName INT NOT NULL'},
+            {type: 'int', precision: null, scale: null, isNullable: true, expectedResult: 'ColumnName INT NULL'},
+            {type: 'bit', precision: null, scale: null, isNullable: false, expectedResult: 'ColumnName BIT NOT NULL'},
+            {type: 'bit', precision: null, scale: null, isNullable: true, expectedResult: 'ColumnName BIT NULL'},
+            {type: 'smallint', precision: null, scale: null, isNullable: false, expectedResult: 'ColumnName SMALLINT NOT NULL'},
+            {type: 'smallint', precision: null, scale: null, isNullable: true, expectedResult: 'ColumnName SMALLINT NULL'},
+            {type: 'tinyint', precision: null, scale: null, isNullable: false, expectedResult: 'ColumnName TINYINT NOT NULL'},
+            {type: 'tinyint', precision: null, scale: null, isNullable: true, expectedResult: 'ColumnName TINYINT NULL'},
+            {type: 'bigint', precision: null, scale: null, isNullable: false, expectedResult: 'ColumnName BIGINT NOT NULL'},
+            {type: 'bigint', precision: null, scale: null, isNullable: true, expectedResult: 'ColumnName BIGINT NULL'},
+            {type: 'decimal', precision: 5, scale: 2, isNullable: false, expectedResult: 'ColumnName DECIMAL(5,2) NOT NULL'},
+            {type: 'decimal', precision: 5, scale: 2, isNullable: true, expectedResult: 'ColumnName DECIMAL(5,2) NULL'}
+        ];
 
-            // Act
-            let script = builder.generateCreateTableColumnStmt(column);
+        typesCases.forEach(typeCase => {
+            it(`should return column definition for type ${typeCase.type.toUpperCase()}, IsNullable: ${typeCase.isNullable}`, () => {
+                // Arrange
+                let builder = new MSSQLServerSqlBuilder(DatabaseType.MSSQL_2016);
+                let column = new Column(1, 'ColumnName', typeCase.type, null, typeCase.precision, typeCase.scale, null, typeCase.isNullable, null, null, null, null, null);
 
-            // Assert
-            expect(script).to.contains('ColumnName INT NOT NULL');
-        });
+                // Act
+                let script = builder.generateCreateTableColumnStmt(column);
 
-        it('should return column definition for type: INT, IsNullable: TRUE', function() {
-            // Arrange
-            let builder = new MSSQLServerSqlBuilder(DatabaseType.MSSQL_2016);
-            let column = new Column(1, 'ColumnName', 'int', 4, 10, 0, null, true, false, null, null, false, null);
-
-            // Act
-            let script = builder.generateCreateTableColumnStmt(column);
-
-            // Assert
-            expect(script).to.contains('ColumnName INT NULL');
+                // Assert
+                expect(script).to.contains(typeCase.expectedResult);
+            });
         });
     });
 

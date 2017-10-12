@@ -1,1 +1,1 @@
-    {ColumnName} {ColumnType} {IsNullable},
+    {Name} {Type}{PrecisionAndScale} {IsNullable},

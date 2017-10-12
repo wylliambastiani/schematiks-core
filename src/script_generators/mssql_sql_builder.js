@@ -8,10 +8,39 @@ const ScriptLoader = require('src/script_loader');
 function MSSQLServerSqlBuilder(databaseType) {
     let _databaseType = databaseType;
     let _scriptLoader = new ScriptLoader(_databaseType);
+    
+    let _columnTypePlaceholderReplacers = {
+        'decimal': columnDecimalPlaceholderReplacer
+    }
 
     function wrapInNewLine(script) {
         const NEWLINE = os.EOL;
         return NEWLINE + script + NEWLINE;
+    }
+
+    function removeRemainingPlaceholders(script) {
+        let pattern = /[{][a-zA-Z0-9+]+[}]/g
+        let scriptWithoutPlaceHolders = script.replace(pattern, '')
+        let scriptWithoutParentheses = scriptWithoutPlaceHolders.replace(pattern, '')
+        return scriptWithoutParentheses
+    }
+
+    function genericColumnPlaceholderReplacer(script, column) {
+        script = script.replace('{Name}', column.name)
+                       .replace('{Type}', column.type.toUpperCase());
+
+        if (!column.isNullable) {
+            script = script.replace('{IsNullable}', 'NOT NULL');
+        } else {
+            script = script.replace('{IsNullable}', 'NULL');
+        }
+
+        return script
+    }
+
+    function columnDecimalPlaceholderReplacer(script, column) {
+        script = script.replace('{PrecisionAndScale}', `(${column.typePrecision},${column.typeScale})`);
+        return script;
     }
 
     this.generateUseStmt = function(databaseName) {
@@ -65,14 +94,14 @@ function MSSQLServerSqlBuilder(databaseType) {
         }
 
         let script = _scriptLoader.getScript('create_table_column_stmt');
-        script = script.replace('{ColumnName}', column.name)
-                       .replace('{ColumnType}', column.type.toString().toUpperCase());
+        script = genericColumnPlaceholderReplacer(script, column);
+        
+        if (column.type in _columnTypePlaceholderReplacers) {
+            script = _columnTypePlaceholderReplacers[column.type](script, column)
+        } 
 
-        if (!column.isNullable) {
-            script = script.replace('{IsNullable}', 'NOT NULL');
-        } else {
-            script = script.replace('{IsNullable}', 'NULL');
-        }
+        script = removeRemainingPlaceholders(script);
+        script = wrapInNewLine(script);
 
         return script;
     }

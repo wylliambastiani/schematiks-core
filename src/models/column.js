@@ -1,8 +1,10 @@
 
 'use strict';    
 
-function Column(id, name, type, typeMaxLength, typePrecision, typeScale, collationName,
-    isNullable, isIdentity, identitySeedValue, identityIncrementValue, isComputed, tableId) {
+function Column(id, name, type, 
+    typeMaxLength, typePrecision, typeScale, 
+    collationName, isNullable, isIdentity, identitySeedValue, identityIncrementValue, 
+    isComputed, tableId) {
         this.id = id;
         this.name = name;
         this.type = type;
