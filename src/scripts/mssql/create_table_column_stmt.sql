@@ -1,1 +1,1 @@
-    {Name} {Type}{PrecisionAndScale} {IsNullable},
+{tab}{ColumnName} {ColumnType}{ColumnMaxLength}{PrecisionAndScale} {Collate} {IsNullable},

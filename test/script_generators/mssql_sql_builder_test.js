@@ -167,35 +167,51 @@ describe('MSSQLServerSqlBuilder', function () {
         });
 
         let typesCases = [
-            {type: 'int', precision: null, scale: null, isNullable: false, expectedResult: 'ColumnName INT NOT NULL'},
-            {type: 'int', precision: null, scale: null, isNullable: true, expectedResult: 'ColumnName INT NULL'},
-            {type: 'bit', precision: null, scale: null, isNullable: false, expectedResult: 'ColumnName BIT NOT NULL'},
-            {type: 'bit', precision: null, scale: null, isNullable: true, expectedResult: 'ColumnName BIT NULL'},
-            {type: 'smallint', precision: null, scale: null, isNullable: false, expectedResult: 'ColumnName SMALLINT NOT NULL'},
-            {type: 'smallint', precision: null, scale: null, isNullable: true, expectedResult: 'ColumnName SMALLINT NULL'},
-            {type: 'tinyint', precision: null, scale: null, isNullable: false, expectedResult: 'ColumnName TINYINT NOT NULL'},
-            {type: 'tinyint', precision: null, scale: null, isNullable: true, expectedResult: 'ColumnName TINYINT NULL'},
-            {type: 'bigint', precision: null, scale: null, isNullable: false, expectedResult: 'ColumnName BIGINT NOT NULL'},
-            {type: 'bigint', precision: null, scale: null, isNullable: true, expectedResult: 'ColumnName BIGINT NULL'},
-            {type: 'decimal', precision: 5, scale: 2, isNullable: false, expectedResult: 'ColumnName DECIMAL(5,2) NOT NULL'},
-            {type: 'decimal', precision: 5, scale: 2, isNullable: true, expectedResult: 'ColumnName DECIMAL(5,2) NULL'},
-            {type: 'money', precision: null, scale: null, isNullable: false, expectedResult: 'ColumnName MONEY NOT NULL'},
-            {type: 'money', precision: null, scale: null, isNullable: true, expectedResult: 'ColumnName MONEY NULL'},
-            {type: 'smallmoney', precision: null, scale: null, isNullable: false, expectedResult: 'ColumnName SMALLMONEY NOT NULL'},
-            {type: 'smallmoney', precision: null, scale: null, isNullable: true, expectedResult: 'ColumnName SMALLMONEY NULL'},
-            {type: 'numeric', precision: 5, scale: 2, isNullable: false, expectedResult: 'ColumnName NUMERIC(5,2) NOT NULL'},
-            {type: 'numeric', precision: 5, scale: 2, isNullable: true, expectedResult: 'ColumnName NUMERIC(5,2) NULL'},
-            {type: 'float', precision: 24, scale: 0, isNullable: false, expectedResult: 'ColumnName FLOAT(24) NOT NULL'},
-            {type: 'float', precision: 24, scale: 0, isNullable: true, expectedResult: 'ColumnName FLOAT(24) NULL'},
-            {type: 'real', precision: 24, scale: 0, isNullable: false, expectedResult: 'ColumnName REAL(24) NOT NULL'},
-            {type: 'real', precision: 24, scale: 0, isNullable: true, expectedResult: 'ColumnName REAL(24) NULL'}
+            {type: 'int', maxLength: null, precision: null, scale: null, isNullable: false, collate: null, expectedResult: 'ColumnName INT NOT NULL'},
+            {type: 'int', maxLength: null, precision: null, scale: null, isNullable: true, collate: null, expectedResult: 'ColumnName INT NULL'},
+            {type: 'bit', maxLength: null, precision: null, scale: null, isNullable: false, collate: null, expectedResult: 'ColumnName BIT NOT NULL'},
+            {type: 'bit', maxLength: null, precision: null, scale: null, isNullable: true, collate: null, expectedResult: 'ColumnName BIT NULL'},
+            {type: 'smallint', maxLength: null, precision: null, scale: null, isNullable: false, collate: null, expectedResult: 'ColumnName SMALLINT NOT NULL'},
+            {type: 'smallint', maxLength: null, precision: null, scale: null, isNullable: true, collate: null, expectedResult: 'ColumnName SMALLINT NULL'},
+            {type: 'tinyint', maxLength: null, precision: null, scale: null, isNullable: false, collate: null, expectedResult: 'ColumnName TINYINT NOT NULL'},
+            {type: 'tinyint', maxLength: null, precision: null, scale: null, isNullable: true, collate: null, expectedResult: 'ColumnName TINYINT NULL'},
+            {type: 'bigint', maxLength: null, precision: null, scale: null, isNullable: false, collate: null, expectedResult: 'ColumnName BIGINT NOT NULL'},
+            {type: 'bigint', maxLength: null, precision: null, scale: null, isNullable: true, collate: null, expectedResult: 'ColumnName BIGINT NULL'},
+            {type: 'decimal', maxLength: null, precision: 5, scale: 2, isNullable: false, collate: null, expectedResult: 'ColumnName DECIMAL(5,2) NOT NULL'},
+            {type: 'decimal', maxLength: null, precision: 5, scale: 2, isNullable: true, collate: null, expectedResult: 'ColumnName DECIMAL(5,2) NULL'},
+            {type: 'money', maxLength: null, precision: null, scale: null, isNullable: false, collate: null, expectedResult: 'ColumnName MONEY NOT NULL'},
+            {type: 'money', maxLength: null, precision: null, scale: null, isNullable: true, collate: null, expectedResult: 'ColumnName MONEY NULL'},
+            {type: 'smallmoney', maxLength: null, precision: null, scale: null, isNullable: false, collate: null, expectedResult: 'ColumnName SMALLMONEY NOT NULL'},
+            {type: 'smallmoney', maxLength: null, precision: null, scale: null, isNullable: true, collate: null, expectedResult: 'ColumnName SMALLMONEY NULL'},
+            {type: 'numeric', maxLength: null, precision: 5, scale: 2, isNullable: false, collate: null, expectedResult: 'ColumnName NUMERIC(5,2) NOT NULL'},
+            {type: 'numeric', maxLength: null, precision: 5, scale: 2, isNullable: true, collate: null, expectedResult: 'ColumnName NUMERIC(5,2) NULL'},
+            {type: 'float', maxLength: null, precision: 24, scale: 0, isNullable: false, collate: null, expectedResult: 'ColumnName FLOAT(24) NOT NULL'},
+            {type: 'float', maxLength: null, precision: 24, scale: 0, isNullable: true, collate: null, expectedResult: 'ColumnName FLOAT(24) NULL'},
+            {type: 'real', maxLength: null, precision: 24, scale: 0, isNullable: false, collate: null, expectedResult: 'ColumnName REAL(24) NOT NULL'},
+            {type: 'real', maxLength: null, precision: 24, scale: 0, isNullable: true, collate: null, expectedResult: 'ColumnName REAL(24) NULL'},
+            {type: 'date', maxLength: null, precision: null, scale: null, isNullable: false, collate: null, expectedResult: 'ColumnName DATE NOT NULL'},
+            {type: 'date', maxLength: null, precision: null, scale: null, isNullable: true, collate: null, expectedResult: 'ColumnName DATE NULL'},
+            {type: 'time', maxLength: null, precision: null, scale: 3, isNullable: false, collate: null, expectedResult: 'ColumnName TIME(3) NOT NULL'},
+            {type: 'time', maxLength: null, precision: null, scale: 3, isNullable: true, collate: null, expectedResult: 'ColumnName TIME(3) NULL'},
+            {type: 'datetime', maxLength: null, precision: null, scale: null, isNullable: false, collate: null, expectedResult: 'ColumnName DATETIME NOT NULL'},
+            {type: 'datetime', maxLength: null, precision: null, scale: null, isNullable: true, collate: null, expectedResult: 'ColumnName DATETIME NULL'},
+            {type: 'datetime2', maxLength: null, precision: null, scale: 7, isNullable: false, collate: null, expectedResult: 'ColumnName DATETIME2(7) NOT NULL'},
+            {type: 'datetime2', maxLength: null, precision: null, scale: 7, isNullable: true, collate: null, expectedResult: 'ColumnName DATETIME2(7) NULL'},
+            {type: 'smalldatetime', maxLength: null, precision: null, scale: null, isNullable: false, collate: null, expectedResult: 'ColumnName SMALLDATETIME NOT NULL'},
+            {type: 'smalldatetime', maxLength: null, precision: null, scale: null, isNullable: true, collate: null, expectedResult: 'ColumnName SMALLDATETIME NULL'},
+            {type: 'datetimeoffset', maxLength: null, precision: null, scale: 7, isNullable: false, collate: null, expectedResult: 'ColumnName DATETIMEOFFSET(7) NOT NULL'},
+            {type: 'datetimeoffset', maxLength: null, precision: null, scale: 7, isNullable: true, collate: null, expectedResult: 'ColumnName DATETIMEOFFSET(7) NULL'},
+            {type: 'char', maxLength: 10, precision: null, scale: null, isNullable: false, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName CHAR(10) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL'},
+            {type: 'char', maxLength: 10, precision: null, scale: null, isNullable: true, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName CHAR(10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL'},
+            {type: 'varchar', maxLength: 10, precision: null, scale: null, isNullable: false, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName VARCHAR(10) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL'},
+            {type: 'varchar', maxLength: 10, precision: null, scale: null, isNullable: true, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName VARCHAR(10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL'},
         ];
 
         typesCases.forEach(typeCase => {
             it(`should return column definition for type ${typeCase.type.toUpperCase()}, IsNullable: ${typeCase.isNullable}`, () => {
                 // Arrange
                 let builder = new MSSQLServerSqlBuilder(DatabaseType.MSSQL_2016);
-                let column = new Column(1, 'ColumnName', typeCase.type, null, typeCase.precision, typeCase.scale, null, typeCase.isNullable, null, null, null, null, null);
+                let column = new Column(1, 'ColumnName', typeCase.type, typeCase.maxLength, typeCase.precision, typeCase.scale, typeCase.collate, typeCase.isNullable, null, null, null, null, null);
 
                 // Act
                 let script = builder.generateCreateTableColumnStmt(column);

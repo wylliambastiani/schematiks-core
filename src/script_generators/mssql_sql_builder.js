@@ -4,6 +4,7 @@ require('rootpath')();
 
 const os = require('os');
 const ScriptLoader = require('src/script_loader');
+const ScriptPlaceholders = require('src/script_generators/script_placeholders');
 
 function MSSQLServerSqlBuilder(databaseType) {
     let _databaseType = databaseType;
@@ -13,36 +14,46 @@ function MSSQLServerSqlBuilder(databaseType) {
         'decimal': columnDecimalPlaceholderReplacer,
         'numeric': columnNumericPlaceholderReplacer,
         'float': columnFloatPlaceholderReplacer,
-        'real': columnRealPlaceholderReplacer
+        'real': columnRealPlaceholderReplacer,
+        'time': columnTimePlaceholderReplacer,
+        'datetime2': columnDateTime2PlaceholderReplacer,
+        'datetimeoffset': columnDateTimeOffsetPlaceholderReplacer,
+        'char': columnCharPlaceholderReplacer,
+        'varchar': columnVarCharPlaceholderReplacer,
     }
 
     function wrapInNewLine(script) {
         const NEWLINE = os.EOL;
         return NEWLINE + script + NEWLINE;
     }
+    
+    function indentLine(script) {
+        return '\t' + script;
+    }
 
     function removeRemainingPlaceholders(script) {
-        let pattern = /[{][a-zA-Z0-9+]+[}]/g
-        let scriptWithoutPlaceHolders = script.replace(pattern, '')
-        let scriptWithoutParentheses = scriptWithoutPlaceHolders.replace(pattern, '')
-        return scriptWithoutParentheses
+        let placeholderPattern = /[{][a-zA-Z0-9+]+[}]/g
+        let scriptWithoutPlaceHolders = script.replace(placeholderPattern, '');
+        let scriptWithoutParentheses = scriptWithoutPlaceHolders.replace(placeholderPattern, '');
+        let scriptWithoutDoubleSpaces = scriptWithoutParentheses.replace(/(\s{2,})/g, ' ');
+        return scriptWithoutDoubleSpaces;
     }
 
     function genericColumnPlaceholderReplacer(script, column) {
-        script = script.replace('{Name}', column.name)
-                       .replace('{Type}', column.type.toUpperCase());
+        script = script.replace(ScriptPlaceholders.ColumnName, column.name)
+                       .replace(ScriptPlaceholders.ColumnType, column.type.toUpperCase());
 
         if (!column.isNullable) {
-            script = script.replace('{IsNullable}', 'NOT NULL');
+            script = script.replace(ScriptPlaceholders.IsNullable, 'NOT NULL');
         } else {
-            script = script.replace('{IsNullable}', 'NULL');
+            script = script.replace(ScriptPlaceholders.IsNullable, 'NULL');
         }
 
         return script
     }
 
     function columnNumericOrDecimalPlaceHolderReplacer(script, column) {
-        script = script.replace('{PrecisionAndScale}', `(${column.typePrecision},${column.typeScale})`);
+        script = script.replace(ScriptPlaceholders.PrecisionAndScale, `(${column.typePrecision},${column.typeScale})`);
         return script;
     }
 
@@ -55,7 +66,7 @@ function MSSQLServerSqlBuilder(databaseType) {
     }
 
     function columnFloatOrRealPlaceholderReplacer(script, column) {
-        return script.replace('{PrecisionAndScale}', `(${column.typePrecision})`);
+        return script.replace(ScriptPlaceholders.PrecisionAndScale, `(${column.typePrecision})`);
     }
 
     function columnFloatPlaceholderReplacer(script, column) {
@@ -66,13 +77,43 @@ function MSSQLServerSqlBuilder(databaseType) {
         return columnFloatOrRealPlaceholderReplacer(script, column);
     }
 
+    function columnDatesAndTimesPlaceholderReplacer(script, column) {
+        return script.replace(ScriptPlaceholders.PrecisionAndScale, `(${column.typeScale})`);
+    }
+
+    function columnDateTime2PlaceholderReplacer(script, column) {
+        return columnDatesAndTimesPlaceholderReplacer(script, column);
+    }
+
+    function columnTimePlaceholderReplacer(script, column) {
+        return columnDatesAndTimesPlaceholderReplacer(script, column);
+    }
+
+    function columnDateTimeOffsetPlaceholderReplacer(script, column) {
+        return columnDatesAndTimesPlaceholderReplacer(script, column);
+    }
+
+    function columnCharAndVarCharPlaceholderReplacer(script, column) {
+        let scriptWithMaxLength = script.replace(ScriptPlaceholders.ColumnMaxLength, `(${column.typeMaxLength})`);
+        let scriptWithCollate = scriptWithMaxLength.replace(ScriptPlaceholders.Collate, `COLLATE ${column.collationName}`);
+        return scriptWithCollate;
+    }
+
+    function columnCharPlaceholderReplacer(script, column) {
+        return columnCharAndVarCharPlaceholderReplacer(script, column);
+    }
+
+    function columnVarCharPlaceholderReplacer(script, column) {
+        return columnCharAndVarCharPlaceholderReplacer(script, column);
+    }
+    
     this.generateUseStmt = function(databaseName) {
         if (!databaseName) {
             throw new Error(`Invalid database name: ${databaseName}`);
         }
 
         let script = _scriptLoader.getScript('use_stmt');
-        script = script.replace('{DatabaseName}', databaseName);
+        script = script.replace(ScriptPlaceholders.DatabaseName, databaseName);
 
         return wrapInNewLine(script);
     }
@@ -83,7 +124,7 @@ function MSSQLServerSqlBuilder(databaseType) {
         }
 
         let script = _scriptLoader.getScript('drop_schema_stmt');
-        script = script.replace('{SchemaName}', schema.name);
+        script = script.replace(ScriptPlaceholders.SchemaName, schema.name);
 
         return wrapInNewLine(script);
     }
@@ -94,8 +135,8 @@ function MSSQLServerSqlBuilder(databaseType) {
         }
  
         let script = _scriptLoader.getScript('drop_table_stmt');
-        script = script.replace('{SchemaName}', table.schema.name)
-                       .replace('{TableName}', table.name);
+        script = script.replace(ScriptPlaceholders.SchemaName, table.schema.name)
+                       .replace(ScriptPlaceholders.TableName, table.name);
         
         return wrapInNewLine(script);
     }
@@ -106,7 +147,7 @@ function MSSQLServerSqlBuilder(databaseType) {
         }
 
         let script = _scriptLoader.getScript('create_schema_stmt');
-        script = script.replace('{SchemaName}', schema.name);
+        script = script.replace(ScriptPlaceholders.SchemaName, schema.name);
         
         return wrapInNewLine(script);
     }
@@ -124,6 +165,7 @@ function MSSQLServerSqlBuilder(databaseType) {
         } 
 
         script = removeRemainingPlaceholders(script);
+        script = indentLine(script);
         script = wrapInNewLine(script);
 
         return script;
