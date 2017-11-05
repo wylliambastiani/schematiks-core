@@ -19,7 +19,9 @@ function MSSQLServerSqlBuilder(databaseType) {
         'datetime2': columnDateTime2PlaceholderReplacer,
         'datetimeoffset': columnDateTimeOffsetPlaceholderReplacer,
         'char': columnCharPlaceholderReplacer,
+        'nchar': columnNCharPlaceholderReplacer,
         'varchar': columnVarCharPlaceholderReplacer,
+        'nvarchar': columnNVarCharPlaceholderReplacer,
     }
 
     function wrapInNewLine(script) {
@@ -93,18 +95,27 @@ function MSSQLServerSqlBuilder(databaseType) {
         return columnDatesAndTimesPlaceholderReplacer(script, column);
     }
 
-    function columnCharAndVarCharPlaceholderReplacer(script, column) {
-        let scriptWithMaxLength = script.replace(ScriptPlaceholders.ColumnMaxLength, `(${column.typeMaxLength})`);
+    function columnStringPlaceholderReplacer(script, column) {
+        let maxLength = column.typeMaxLength == -1? '(MAX)' : `(${column.typeMaxLength})`;
+        let scriptWithMaxLength = script.replace(ScriptPlaceholders.ColumnMaxLength, maxLength);
         let scriptWithCollate = scriptWithMaxLength.replace(ScriptPlaceholders.Collate, `COLLATE ${column.collationName}`);
         return scriptWithCollate;
     }
 
     function columnCharPlaceholderReplacer(script, column) {
-        return columnCharAndVarCharPlaceholderReplacer(script, column);
+        return columnStringPlaceholderReplacer(script, column);
+    }
+
+    function columnNCharPlaceholderReplacer(script, column) {
+        return columnStringPlaceholderReplacer(script, column);
     }
 
     function columnVarCharPlaceholderReplacer(script, column) {
-        return columnCharAndVarCharPlaceholderReplacer(script, column);
+        return columnStringPlaceholderReplacer(script, column);
+    }
+
+    function columnNVarCharPlaceholderReplacer(script, column) {
+        return columnStringPlaceholderReplacer(script, column);
     }
     
     this.generateUseStmt = function(databaseName) {

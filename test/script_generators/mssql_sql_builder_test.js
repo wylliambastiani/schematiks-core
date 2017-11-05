@@ -203,8 +203,14 @@ describe('MSSQLServerSqlBuilder', function () {
             {type: 'datetimeoffset', maxLength: null, precision: null, scale: 7, isNullable: true, collate: null, expectedResult: 'ColumnName DATETIMEOFFSET(7) NULL'},
             {type: 'char', maxLength: 10, precision: null, scale: null, isNullable: false, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName CHAR(10) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL'},
             {type: 'char', maxLength: 10, precision: null, scale: null, isNullable: true, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName CHAR(10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL'},
+            {type: 'nchar', maxLength: 10, precision: null, scale: null, isNullable: false, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName NCHAR(10) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL'},
+            {type: 'nchar', maxLength: 10, precision: null, scale: null, isNullable: true, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName NCHAR(10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL'},
             {type: 'varchar', maxLength: 10, precision: null, scale: null, isNullable: false, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName VARCHAR(10) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL'},
             {type: 'varchar', maxLength: 10, precision: null, scale: null, isNullable: true, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName VARCHAR(10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL'},
+            {type: 'varchar', maxLength: -1, precision: null, scale: null, isNullable: true, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName VARCHAR(MAX) COLLATE SQL_Latin1_General_CP1_CI_AS NULL'},
+            {type: 'nvarchar', maxLength: 10, precision: null, scale: null, isNullable: false, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName NVARCHAR(10) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL'},
+            {type: 'nvarchar', maxLength: 10, precision: null, scale: null, isNullable: true, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName NVARCHAR(10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL'},
+            {type: 'nvarchar', maxLength: -1, precision: null, scale: null, isNullable: true, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName NVARCHAR(MAX) COLLATE SQL_Latin1_General_CP1_CI_AS NULL'},
         ];
 
         typesCases.forEach(typeCase => {
