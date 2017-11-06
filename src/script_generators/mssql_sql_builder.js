@@ -22,6 +22,10 @@ function MSSQLServerSqlBuilder(databaseType) {
         'nchar': columnNCharPlaceholderReplacer,
         'varchar': columnVarCharPlaceholderReplacer,
         'nvarchar': columnNVarCharPlaceholderReplacer,
+        'text': columnTextPlaceholderReaplcer,
+        'ntext': columnNTextPlaceholderReaplcer,
+        'binary': columnBinaryPlaceholderReplacer,
+        'varbinary': columnVarBinaryPlaceholderReplacer,
     }
 
     function wrapInNewLine(script) {
@@ -96,7 +100,16 @@ function MSSQLServerSqlBuilder(databaseType) {
     }
 
     function columnStringPlaceholderReplacer(script, column) {
-        let maxLength = column.typeMaxLength == -1? '(MAX)' : `(${column.typeMaxLength})`;
+        let maxLength = '';
+        
+        if (column.typeMaxLength == -1) {
+            maxLength = '(MAX)';
+        } else if (column.type.toLowerCase() == 'nchar' || column.type.toLowerCase() == 'nvarchar' || column.type.toLowerCase() == 'ntext') {
+            maxLength = '(' + column.typeMaxLength / 2 + ')';
+        } else {
+            maxLength = `(${column.typeMaxLength})`;
+        }
+         
         let scriptWithMaxLength = script.replace(ScriptPlaceholders.ColumnMaxLength, maxLength);
         let scriptWithCollate = scriptWithMaxLength.replace(ScriptPlaceholders.Collate, `COLLATE ${column.collationName}`);
         return scriptWithCollate;
@@ -110,6 +123,10 @@ function MSSQLServerSqlBuilder(databaseType) {
         return columnStringPlaceholderReplacer(script, column);
     }
 
+    function columnTextPlaceholderReaplcer(script, column) {
+        return columnStringPlaceholderReplacer(script, column);
+    }
+
     function columnVarCharPlaceholderReplacer(script, column) {
         return columnStringPlaceholderReplacer(script, column);
     }
@@ -117,7 +134,27 @@ function MSSQLServerSqlBuilder(databaseType) {
     function columnNVarCharPlaceholderReplacer(script, column) {
         return columnStringPlaceholderReplacer(script, column);
     }
+
+    function columnNTextPlaceholderReaplcer(script, column) {
+        return columnStringPlaceholderReplacer(script, column);
+    }
     
+    function columnBinaryPlaceholderReplacer(script, column) {
+        return script.replace(ScriptPlaceholders.ColumnMaxLength, `(${column.typeMaxLength})`);
+    }
+
+    function columnVarBinaryPlaceholderReplacer(script, column) {
+        let maxLength = '';
+
+        if (column.typeMaxLength == -1) {
+            maxLength = '(MAX)';
+        } else {
+            maxLength = `(${column.typeMaxLength})`;
+        }
+
+        return script.replace(ScriptPlaceholders.ColumnMaxLength, maxLength);
+    }
+
     this.generateUseStmt = function(databaseName) {
         if (!databaseName) {
             throw new Error(`Invalid database name: ${databaseName}`);
