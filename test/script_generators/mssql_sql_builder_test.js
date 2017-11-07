@@ -211,10 +211,10 @@ describe('MSSQLServerSqlBuilder', function () {
             {type: 'nvarchar', maxLength: 20, precision: null, scale: null, isNullable: false, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName NVARCHAR(10) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL'},
             {type: 'nvarchar', maxLength: 20, precision: null, scale: null, isNullable: true, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName NVARCHAR(10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL'},
             {type: 'nvarchar', maxLength: -1, precision: null, scale: null, isNullable: true, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName NVARCHAR(MAX) COLLATE SQL_Latin1_General_CP1_CI_AS NULL'},
-            {type: 'text', maxLength: 10, precision: null, scale: null, isNullable: false, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName TEXT(10) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL'},
-            {type: 'text', maxLength: 10, precision: null, scale: null, isNullable: true, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName TEXT(10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL'},
-            {type: 'ntext', maxLength: 20, precision: null, scale: null, isNullable: false, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName NTEXT(10) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL'},
-            {type: 'ntext', maxLength: 20, precision: null, scale: null, isNullable: true, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName NTEXT(10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL'},
+            {type: 'text', maxLength: 10, precision: null, scale: null, isNullable: false, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName TEXT COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL'},
+            {type: 'text', maxLength: 10, precision: null, scale: null, isNullable: true, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName TEXT COLLATE SQL_Latin1_General_CP1_CI_AS NULL'},
+            {type: 'ntext', maxLength: 20, precision: null, scale: null, isNullable: false, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName NTEXT COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL'},
+            {type: 'ntext', maxLength: 20, precision: null, scale: null, isNullable: true, collate: 'SQL_Latin1_General_CP1_CI_AS', expectedResult: 'ColumnName NTEXT COLLATE SQL_Latin1_General_CP1_CI_AS NULL'},
             {type: 'binary', maxLength: 10, precision: null, scale: null, isNullable: false, collate: null, expectedResult: 'ColumnName BINARY(10) NOT NULL'},
             {type: 'binary', maxLength: 10, precision: null, scale: null, isNullable: true, collate: null, expectedResult: 'ColumnName BINARY(10) NULL'},
             {type: 'varbinary', maxLength: 10, precision: null, scale: null, isNullable: false, collate: null, expectedResult: 'ColumnName VARBINARY(10) NOT NULL'},
@@ -239,7 +239,6 @@ describe('MSSQLServerSqlBuilder', function () {
         });
     });
 
-    /*
     describe('generateCreateTableStmt', function() {
         let createTableStmtErrorCases = [
             {args: null},
@@ -258,7 +257,7 @@ describe('MSSQLServerSqlBuilder', function () {
             });
         });
 
-        it('should return create table script for empty table', function() {
+        it('should throw Error for empty table', function() {
             // Arrange
             let builder = new MSSQLServerSqlBuilder(DatabaseType.MSSQL_2016);
             
@@ -267,11 +266,29 @@ describe('MSSQLServerSqlBuilder', function () {
 
             table.schema = schema;
             
+            // Act + Assert
+            let fun = function() { builder.generateCreateTableStmt(table); };
+            expect(fun).to.throw(Error, `Cannot create table with no columns`);
+        });
+
+        it('should return script for table with 1 column', function() {
+            // Arrange
+            let builder = new MSSQLServerSqlBuilder(DatabaseType.MSSQL_2016);
+
+            let schema = new Schema(1, 'Schema');
+            let table = new Table(1, 'CreatedTable', new Date(2017, 1, 1), new Date(2017, 1, 1), 1, false);
+            let column = new Column(1, 'ColumnName', 'INT', null, null, null, null, false, false, 0, 0, false, 1);
+
+            column.table = table;
+            table.schema = schema;
+            table.columns = [column];
+
             // Act
             let script = builder.generateCreateTableStmt(table);
 
             // Assert
-            expect(script).to.contains(`CREATE TABLE ${schema.name}.${table.name}`);
+            expect(script).to.contain('CREATE TABLE Schema.CreatedTable');
+            expect(script).to.contain('ColumnName INT NOT NULL');
         });
-    });*/
+    });
 });

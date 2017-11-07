@@ -9,7 +9,8 @@ const placeholders = {
     'IsNullable': '{IsNullable}',
     'PrecisionAndScale': '{PrecisionAndScale}',
     'Collate': '{Collate}',
-    'ColumnMaxLength': '{ColumnMaxLength}'
+    'ColumnMaxLength': '{ColumnMaxLength}',
+    'Columns': '{Columns}'
 };
 
 module.exports = Object.freeze(placeholders);

@@ -22,15 +22,15 @@ function MSSQLServerSqlBuilder(databaseType) {
         'nchar': columnNCharPlaceholderReplacer,
         'varchar': columnVarCharPlaceholderReplacer,
         'nvarchar': columnNVarCharPlaceholderReplacer,
-        'text': columnTextPlaceholderReaplcer,
-        'ntext': columnNTextPlaceholderReaplcer,
+        'text': columnTextAndNTextPlaceholderReaplacer,
+        'ntext': columnTextAndNTextPlaceholderReaplacer,
         'binary': columnBinaryPlaceholderReplacer,
         'varbinary': columnVarBinaryPlaceholderReplacer,
     }
 
-    function wrapInNewLine(script) {
+    function wrapInNewLine(script, newLineCount = 1) {
         const NEWLINE = os.EOL;
-        return NEWLINE + script + NEWLINE;
+        return NEWLINE.repeat(newLineCount) + script;
     }
     
     function indentLine(script) {
@@ -44,6 +44,8 @@ function MSSQLServerSqlBuilder(databaseType) {
         let scriptWithoutDoubleSpaces = scriptWithoutParentheses.replace(/(\s{2,})/g, ' ');
         return scriptWithoutDoubleSpaces;
     }
+
+    //#region Columns Methods
 
     function genericColumnPlaceholderReplacer(script, column) {
         script = script.replace(ScriptPlaceholders.ColumnName, column.name)
@@ -104,7 +106,7 @@ function MSSQLServerSqlBuilder(databaseType) {
         
         if (column.typeMaxLength == -1) {
             maxLength = '(MAX)';
-        } else if (column.type.toLowerCase() == 'nchar' || column.type.toLowerCase() == 'nvarchar' || column.type.toLowerCase() == 'ntext') {
+        } else if (column.type.toLowerCase() == 'nchar' || column.type.toLowerCase() == 'nvarchar') {
             maxLength = '(' + column.typeMaxLength / 2 + ')';
         } else {
             maxLength = `(${column.typeMaxLength})`;
@@ -123,10 +125,6 @@ function MSSQLServerSqlBuilder(databaseType) {
         return columnStringPlaceholderReplacer(script, column);
     }
 
-    function columnTextPlaceholderReaplcer(script, column) {
-        return columnStringPlaceholderReplacer(script, column);
-    }
-
     function columnVarCharPlaceholderReplacer(script, column) {
         return columnStringPlaceholderReplacer(script, column);
     }
@@ -135,8 +133,9 @@ function MSSQLServerSqlBuilder(databaseType) {
         return columnStringPlaceholderReplacer(script, column);
     }
 
-    function columnNTextPlaceholderReaplcer(script, column) {
-        return columnStringPlaceholderReplacer(script, column);
+    function columnTextAndNTextPlaceholderReaplacer(script, column) {
+        let scriptWithCollate = script.replace(ScriptPlaceholders.Collate, `COLLATE ${column.collationName}`);
+        return scriptWithCollate;
     }
     
     function columnBinaryPlaceholderReplacer(script, column) {
@@ -154,6 +153,8 @@ function MSSQLServerSqlBuilder(databaseType) {
 
         return script.replace(ScriptPlaceholders.ColumnMaxLength, maxLength);
     }
+    
+    //#endregion Columns Methods
 
     this.generateUseStmt = function(databaseName) {
         if (!databaseName) {
@@ -197,7 +198,7 @@ function MSSQLServerSqlBuilder(databaseType) {
         let script = _scriptLoader.getScript('create_schema_stmt');
         script = script.replace(ScriptPlaceholders.SchemaName, schema.name);
         
-        return wrapInNewLine(script);
+        return wrapInNewLine(script, 2);
     }
 
     this.generateCreateTableColumnStmt = function(column) {
@@ -219,17 +220,29 @@ function MSSQLServerSqlBuilder(databaseType) {
         return script;
     }
 
-    // this.generateCreateTableStmt = function(table) {
-    //     if (!table) {
-    //         throw new Error(`Invalid table value: ${table}`);
-    //     }
+    this.generateCreateTableStmt = function(table) {
+        if (!table) {
+            throw new Error(`Invalid table value: ${table}`);
+        }
 
-    //     let script = _scriptLoader.getScript('create_table_stmt');
-    //     script = script.replace('{SchemaName}', table.schema.name)
-    //                    .replace('{TableName}', table.name);
+        if (table.columns === null || table.columns === undefined || table.columns.length === 0) {
+            throw new Error('Cannot create table with no columns');
+        }
 
-    //     return wrapInNewLine(script);
-    // };
+        let script = _scriptLoader.getScript('create_table_stmt');
+        script = script.replace(ScriptPlaceholders.SchemaName, table.schema.name);
+        script = script.replace(ScriptPlaceholders.TableName, table.name);
+
+        let columnsScript = '';
+        for (let column of table.columns) {
+            let columnScript = this.generateCreateTableColumnStmt(column);
+            columnsScript += columnScript;
+        }
+
+        script = script.replace(ScriptPlaceholders.Columns, columnsScript);
+
+        return wrapInNewLine(script, 2);
+    };
 }
 
 module.exports = MSSQLServerSqlBuilder;

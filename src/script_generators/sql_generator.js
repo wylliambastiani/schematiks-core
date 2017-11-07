@@ -64,7 +64,7 @@ function SqlGenerator(sqlBuilder) {
 
         // creates
         generateCreateSchemas(diff);
-        //generateCreateTables(diff);
+        generateCreateTables(diff);
 
         return _script;
     }
