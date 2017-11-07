@@ -1,5 +1,5 @@
 CREATE TABLE {SchemaName}.{TableName}
 (
-    {Columns}
+{Columns}
 );
 GO
