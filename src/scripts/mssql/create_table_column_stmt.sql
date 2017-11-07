@@ -1,1 +1,1 @@
-{tab}{ColumnName} {ColumnType}{ColumnMaxLength}{PrecisionAndScale} {Collate} {IsNullable},
+{ColumnName} {ColumnType}{ColumnMaxLength}{PrecisionAndScale} {Collate} {IsNullable} {Identity}

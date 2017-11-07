@@ -42,7 +42,12 @@ function MSSQLServerSqlBuilder(databaseType) {
         let scriptWithoutPlaceHolders = script.replace(placeholderPattern, '');
         let scriptWithoutParentheses = scriptWithoutPlaceHolders.replace(placeholderPattern, '');
         let scriptWithoutDoubleSpaces = scriptWithoutParentheses.replace(/(\s{2,})/g, ' ');
-        return scriptWithoutDoubleSpaces;
+        let scriptWithNotRightSpaces = scriptWithoutDoubleSpaces.trimRight();
+        return scriptWithNotRightSpaces;
+    }
+
+    function insertCommaBeforeColumnDefinition(columnScript) {
+        return ',' + columnScript;
     }
 
     //#region Columns Methods
@@ -55,6 +60,10 @@ function MSSQLServerSqlBuilder(databaseType) {
             script = script.replace(ScriptPlaceholders.IsNullable, 'NOT NULL');
         } else {
             script = script.replace(ScriptPlaceholders.IsNullable, 'NULL');
+        }
+
+        if (column.isIdentity) {
+            script = script.replace('{Identity}', `IDENTITY(${column.identitySeedValue}, ${column.identityIncrementValue})`);
         }
 
         return script
@@ -214,9 +223,7 @@ function MSSQLServerSqlBuilder(databaseType) {
         } 
 
         script = removeRemainingPlaceholders(script);
-        script = indentLine(script);
-        script = wrapInNewLine(script);
-
+        
         return script;
     }
 
@@ -234,8 +241,19 @@ function MSSQLServerSqlBuilder(databaseType) {
         script = script.replace(ScriptPlaceholders.TableName, table.name);
 
         let columnsScript = '';
-        for (let column of table.columns) {
-            let columnScript = this.generateCreateTableColumnStmt(column);
+        for(let index in table.columns) {
+            let columnScript = this.generateCreateTableColumnStmt(table.columns[index]);
+            
+            if (index > 0) {
+                columnScript = ',' + columnScript;
+            }
+
+            columnScript = indentLine(columnScript);
+
+            if (index > 0) {
+                columnScript = wrapInNewLine(columnScript);
+            }
+            
             columnsScript += columnScript;
         }
 
