@@ -10,6 +10,7 @@ function Table(id, name, createDate, modifyDate, schemaId, hasData) {
     this.schema = null;
     this.hasData = hasData;
     this.columns = [];
+    this.constraints = [];
 
     Object.defineProperty(this, 'fullName', {
         get: function() { 

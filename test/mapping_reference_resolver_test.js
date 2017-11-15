@@ -10,6 +10,9 @@ const DatabaseMap = require('src/models/database_map');
 const Schema = require('src/models/schema');
 const Table = require('src/models/table');
 const Column = require('src/models/column');
+const Constraint = require('src/models/constraint');
+const ConstraintTypes = require('src/models/constraint_types');
+
 
 describe('MappingReferenceResolver', function () {
     describe ('resolveSchemaTableReferences', function () {
@@ -52,6 +55,24 @@ describe('MappingReferenceResolver', function () {
             expect(mapping.tables[1].schema).to.be.equal(mapping.schemas[0]);
             expect(mapping.tables[2].schema).to.be.equal(mapping.schemas[1]);
         });
+    });
+
+    describe ('resolveTableColumnReferences', function () {
+        it ('should set no object reference for not related objects', async function () {
+            let mapping = new DatabaseMap();
+            mapping.tables = [
+                new Table(1, 'table1', new Date(), new Date(), 1)
+            ];
+            mapping.columns = [
+                new Column(1, 'column1', 'int', null, null, null, null, false, true, 1, 1, false, 99),
+            ];
+
+            let referenceResolver = new MappingReferenceResolver();
+            referenceResolver.resolveTableColumnReferences(mapping.tables, mapping.columns);
+
+            expect(mapping.tables[0].columns).to.have.lengthOf(0);
+            expect(mapping.columns[0].table).to.be.null;
+        });
 
         it ('should set table column references for related objects only', function () {
             let mapping = new DatabaseMap();
@@ -71,6 +92,47 @@ describe('MappingReferenceResolver', function () {
             expect(mapping.columns[0].table).to.be.equal(mapping.tables[0]);
             expect(mapping.columns[1].table).to.be.equal(mapping.tables[0]);
             expect(mapping.columns[2].table).to.be.null;
+        });
+    });
+
+    describe ('resolvePrimaryKeyReferences', function (){ 
+        // resolve primary key refereces
+        it ('should set no object reference for not related objects', function () {
+            let mapping = new DatabaseMap();
+            mapping.tables = [
+                new Table(1, 'table1', new Date(), new Date(), 1)
+            ];
+            mapping.columns = [
+                new Column(1, 'column1', 'int', null, null, null, null, false, true, 1, 1, false, 1),
+            ];
+            mapping.primaryKeys = [
+                new Constraint(1, 'PK_Table2_Column1', ConstraintTypes.PK, 99, 1, null, null)
+            ];
+
+            let referenceResolver = new MappingReferenceResolver();
+            referenceResolver.resolvePrimaryKeyReferences(mapping.tables, mapping.primaryKeys);
+
+            expect(mapping.tables[0].constraints).to.have.lengthOf(0);
+            expect(mapping.primaryKeys[0].sourceTable).to.be.null;
+        });
+
+        it ('should set primary key references for related objects only', async function () {
+            let mapping = new DatabaseMap();
+            mapping.tables = [
+                new Table(1, 'table1', new Date(), new Date(), 1)
+            ];
+            mapping.columns = [
+                new Column(1, 'column1', 'int', null, null, null, null, false, true, 1, 1, false, 1),
+            ];
+            mapping.primaryKeys = [
+                new Constraint(1, 'PK_Table1_Column1', ConstraintTypes.PK, 1, 1, null, null)
+            ];
+
+            let referenceResolver = new MappingReferenceResolver();
+            referenceResolver.resolvePrimaryKeyReferences(mapping.tables, mapping.primaryKeys);
+
+            expect(mapping.tables[0].constraints).to.have.lengthOf(1);
+            expect(mapping.primaryKeys[0].sourceTable).to.not.be.null;
         });
     });
 });

@@ -6,9 +6,10 @@ require('rootpath')();
 const mssql = require('mssql');
 const S = require('string');
 const ScriptLoader = require('src/script_loader');
-const Schema = require('src/models/schema.js');
-const Table = require('src/models/table.js');
-const Column = require('src/models/column.js');
+const Schema = require('src/models/schema');
+const Table = require('src/models/table');
+const Column = require('src/models/column');
+const Constraint = require('src/models/constraint');
 
 function MSSQLDatabaseMapperDao(connectionSettings) {
     let _connectionSettings = connectionSettings;
@@ -77,6 +78,39 @@ function MSSQLDatabaseMapperDao(connectionSettings) {
                 row.table_id
             );
         });
+    }
+
+    this.getPrimaryKeys = async function() {
+        let result = await getDatabaseObject('select_all_database_primary_keys');
+        let constraints = result.recordset.map(constraint => {
+            return new Constraint(
+                constraint.constraint_id,
+                constraint.constraint_name,
+                constraint.constraint_type,
+                constraint.table_id,
+                [constraint.column_id],
+                null, 
+                null
+            );
+        });
+
+        let joinedConstraints = [];
+        for (let constraint of constraints) {
+            let constraintAlreadyJoined = false;
+            
+            for (let alreadyJoinedConstraints of joinedConstraints) {
+                if (alreadyJoinedConstraints.id === constraint.id) {
+                    alreadyJoinedConstraints.sourceColumnIds.push(...constraint.sourceColumnIds);
+                    constraintAlreadyJoined = true;
+                }
+            }
+
+            if (!constraintAlreadyJoined) {
+                joinedConstraints.push(constraint);
+            }
+        }
+
+        return joinedConstraints;
     }
 
     this.getDatabaseType = function() {

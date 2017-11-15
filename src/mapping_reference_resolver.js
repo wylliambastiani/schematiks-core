@@ -35,6 +35,21 @@ function MappingReferenceResolver() {
             table.columns.push(...columnsInTable);
         }
     }
+
+    this.resolvePrimaryKeyReferences = function (tables, primaryKeys) {
+        if ((!tables || tables.length === 0) || (!primaryKeys || primaryKeys.length === 0))
+            return;
+
+        for (let primaryKey of primaryKeys) {
+            let parentTable = tables.filter(table => { return table.id === primaryKey.sourceTableId; })[0];
+
+            if (parentTable === null || parentTable === undefined)
+                continue;
+
+            primaryKey.sourceTable = parentTable;
+            parentTable.constraints.push(primaryKey);
+        }
+    }
 }
 
 module.exports = MappingReferenceResolver;

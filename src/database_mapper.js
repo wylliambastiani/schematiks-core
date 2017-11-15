@@ -12,9 +12,10 @@ function DatabaseMapper(dao) {
     this.map = async function() {
         let referenceResolver = new MappingReferenceResolver();
 
-        let schemas = await this.mapSchemas(dao);
-        let tables = await this.mapTables(dao);
-        let columns = await this.mapColumns(dao);
+        let schemas = await this.mapSchemas();
+        let tables = await this.mapTables();
+        let columns = await this.mapColumns();
+        let primaryKeys = await this.mapPrimaryKeys(dao);
 
         let mapping = new DatabaseMap();
         mapping.databaseType = dao.getDatabaseType();
@@ -22,7 +23,8 @@ function DatabaseMapper(dao) {
         mapping.schemas = schemas;
         mapping.tables = tables;
         mapping.columns = columns;
-
+        mapping.primaryKeys = primaryKeys;
+        
         referenceResolver.resolveReferences(mapping);
 
         return mapping;
