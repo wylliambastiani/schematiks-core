@@ -9,6 +9,7 @@ const DatabaseMapper = require('src/database_mapper');
 const Schema = require('src/models/schema');
 const Table = require('src/models/table');
 const Column = require('src/models/column');
+const Constraint = require('src/models/constraint');
 
 describe('DatabaseMapper', function () {
     describe ('mapSchemas', function () {
@@ -80,6 +81,30 @@ describe('DatabaseMapper', function () {
             let columns = await mapper.mapColumns();
             
             expect(columns).to.not.be.empty;
+        });
+    });
+
+    describe ('mapPrimaryKeys', function () {
+        it ('should return an empty array when no primary keys exists', async function () {
+            let databaseMappingDao = {
+                getPrimaryKeys: testHelpers.createFunctionStubReturnsEmptyList()
+            };
+
+            let mapper = new DatabaseMapper(databaseMappingDao);
+            let primaryKeys = await mapper.mapPrimaryKeys();
+
+            expect(primaryKeys).to.be.empty;
+        });
+
+        it ('should return a non empty array when primary keys exists', async function () {
+            let databaseMappingDao = {
+                getPrimaryKeys: testHelpers.createFunctionStubReturnsNonEmptyList([new Constraint()])
+            };
+
+            let mapper = new DatabaseMapper(databaseMappingDao);
+            let primaryKeys = await mapper.mapPrimaryKeys();
+
+            expect(primaryKeys).to.not.be.empty;
         });
     });
 });

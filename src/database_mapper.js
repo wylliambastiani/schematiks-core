@@ -39,6 +39,10 @@ function DatabaseMapper(dao) {
     this.mapColumns = async function() {
         return await _dao.getColumns();
     }
+
+    this.mapPrimaryKeys = async function() {
+        return await _dao.getPrimaryKeys();
+    }
 }
 
 module.exports = DatabaseMapper;
