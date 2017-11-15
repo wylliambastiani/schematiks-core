@@ -125,7 +125,7 @@ describe('MappingReferenceResolver', function () {
                 new Column(1, 'column1', 'int', null, null, null, null, false, true, 1, 1, false, 1),
             ];
             mapping.primaryKeys = [
-                new Constraint(1, 'PK_Table1_Column1', ConstraintTypes.PK, 1, 1, null, null)
+                new Constraint(1, 'PK_Table1_Column1', ConstraintTypes.PK, 1, [1], null, null)
             ];
 
             let referenceResolver = new MappingReferenceResolver();
