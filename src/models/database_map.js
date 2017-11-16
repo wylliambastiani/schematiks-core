@@ -7,7 +7,7 @@ function DatabaseMap() {
     this.schemas = [];
     this.tables = [];
     this.columns = [];
-    this.primaryKeys = [];
+    this.constraints = [];
 }
 
 module.exports = DatabaseMap;

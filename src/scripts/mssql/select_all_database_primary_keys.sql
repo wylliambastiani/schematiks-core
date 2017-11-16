@@ -4,6 +4,7 @@ SELECT
 	,KC.[name] AS [constraint_name]
 	,TAB.[object_id] AS [table_id]
 	,COL.[column_id] AS [column_id]
+	,IC.[is_descending_key] AS [is_descending_key]
 	,KC.[type] AS [constraint_type]
 FROM {DatabaseName}.sys.tables AS TAB
     INNER JOIN {DatabaseName}.sys.columns AS COL ON COL.[object_id] = TAB.[object_id]

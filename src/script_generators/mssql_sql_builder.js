@@ -227,6 +227,10 @@ function MSSQLServerSqlBuilder(databaseType) {
         return script;
     }
 
+    // this.generateCreateTablePrimaryKeyStmt = function(table) {
+    //     return '';
+    // }
+
     this.generateCreateTableStmt = function(table) {
         if (!table) {
             throw new Error(`Invalid table value: ${table}`);
@@ -257,7 +261,7 @@ function MSSQLServerSqlBuilder(databaseType) {
             columnsScript += columnScript;
         }
 
-        script = script.replace(ScriptPlaceholders.Columns, columnsScript);
+        script = script.replace(ScriptPlaceholders.CreateTableBodyContent, columnsScript);
 
         return wrapInNewLine(script, 2);
     };

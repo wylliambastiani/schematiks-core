@@ -10,6 +10,7 @@ const Schema = require('src/models/schema');
 const Table = require('src/models/table');
 const Column = require('src/models/column');
 const Constraint = require('src/models/constraint');
+const ConstraintColumn = require('src/models/constraint_column');
 
 function MSSQLDatabaseMapperDao(connectionSettings) {
     let _connectionSettings = connectionSettings;
@@ -88,7 +89,7 @@ function MSSQLDatabaseMapperDao(connectionSettings) {
                 constraint.constraint_name,
                 constraint.constraint_type,
                 constraint.table_id,
-                [constraint.column_id],
+                [new ConstraintColumn(constraint.column_id, constraint.is_descending_key)],
                 null, 
                 null
             );

@@ -1,1 +1,1 @@
-{ColumnName} {ColumnType}{ColumnMaxLength}{PrecisionAndScale} {Collate} {IsNullable} {Identity}
+[{ColumnName}] {ColumnType}{ColumnMaxLength}{PrecisionAndScale} {Collate} {IsNullable} {Identity}

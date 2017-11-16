@@ -23,7 +23,7 @@ function DatabaseMapper(dao) {
         mapping.schemas = schemas;
         mapping.tables = tables;
         mapping.columns = columns;
-        mapping.primaryKeys = primaryKeys;
+        mapping.constraints.push(...primaryKeys);
         
         referenceResolver.resolveReferences(mapping);
 

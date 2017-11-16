@@ -1,5 +1,7 @@
 'use strict';
 
+const ConstraintTypes = require('src/models/constraint_types');
+
 function MappingReferenceResolver() {
     this.resolveReferences = function(map) {
         this.resolveSchemaTableReferences(map.schemas, map.tables);
@@ -36,11 +38,12 @@ function MappingReferenceResolver() {
         }
     }
 
-    this.resolvePrimaryKeyReferences = function (tables, primaryKeys) {
-        if ((!tables || tables.length === 0) || (!primaryKeys || primaryKeys.length === 0))
+    this.resolvePrimaryKeyReferences = function (tables, constraints) {
+        if ((!tables || tables.length === 0) || (!constraints || constraints.length === 0))
             return;
 
-        for (let primaryKey of primaryKeys) {
+        let primaryKeys = constraints.filter(constraint => { return constraint.type === ConstraintTypes.PK; });
+        for (let primaryKey of constraints) {
             let parentTable = tables.filter(table => { return table.id === primaryKey.sourceTableId; })[0];
 
             if (parentTable === null || parentTable === undefined)
