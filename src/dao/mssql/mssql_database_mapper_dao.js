@@ -11,6 +11,7 @@ const Table = require('src/models/table');
 const Column = require('src/models/column');
 const Constraint = require('src/models/constraint');
 const ConstraintColumn = require('src/models/constraint_column');
+const ConstraintTarget = require('src/models/constraint_target');
 
 function MSSQLDatabaseMapperDao(connectionSettings) {
     let _connectionSettings = connectionSettings;
@@ -88,9 +89,7 @@ function MSSQLDatabaseMapperDao(connectionSettings) {
                 constraint.constraint_id,
                 constraint.constraint_name,
                 constraint.constraint_type,
-                constraint.table_id,
-                [new ConstraintColumn(constraint.column_id, constraint.is_descending_key)],
-                null, 
+                new ConstraintTarget(constraint.table_id, [new ConstraintColumn(constraint.column_id, constraint.is_descending_key)]),
                 null
             );
         });
@@ -99,9 +98,9 @@ function MSSQLDatabaseMapperDao(connectionSettings) {
         for (let constraint of constraints) {
             let constraintAlreadyJoined = false;
             
-            for (let alreadyJoinedConstraints of joinedConstraints) {
-                if (alreadyJoinedConstraints.id === constraint.id) {
-                    alreadyJoinedConstraints.sourceColumnIds.push(...constraint.sourceColumnIds);
+            for (let alreadyJoinedConstraint of joinedConstraints) {
+                if (alreadyJoinedConstraint.id === constraint.id) {
+                    alreadyJoinedConstraint.sourceTarget.constraintColumns.push(...constraint.sourceTarget.constraintColumns);
                     constraintAlreadyJoined = true;
                 }
             }

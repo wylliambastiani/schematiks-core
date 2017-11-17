@@ -44,12 +44,12 @@ function MappingReferenceResolver() {
 
         let primaryKeys = constraints.filter(constraint => { return constraint.type === ConstraintTypes.PK; });
         for (let primaryKey of constraints) {
-            let parentTable = tables.filter(table => { return table.id === primaryKey.sourceTableId; })[0];
+            let parentTable = tables.filter(table => { return table.id === primaryKey.sourceTarget.tableId; })[0];
 
             if (parentTable === null || parentTable === undefined)
                 continue;
 
-            primaryKey.sourceTable = parentTable;
+            primaryKey.sourceTarget.table = parentTable;
             parentTable.constraints.push(primaryKey);
         }
     }

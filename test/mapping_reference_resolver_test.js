@@ -11,6 +11,7 @@ const Schema = require('src/models/schema');
 const Table = require('src/models/table');
 const Column = require('src/models/column');
 const Constraint = require('src/models/constraint');
+const ConstraintTarget = require('src/models/constraint_target');
 const ConstraintColumn = require('src/models/constraint_column');
 const ConstraintTypes = require('src/models/constraint_types');
 
@@ -107,14 +108,16 @@ describe('MappingReferenceResolver', function () {
                 new Column(1, 'column1', 'int', null, null, null, null, false, true, 1, 1, false, 1),
             ];
             mapping.constraints = [
-                new Constraint(1, 'PK_Table2_Column1', ConstraintTypes.PK, 99, [new ConstraintColumn(1, false)], null, null)
+                new Constraint(1, 'PK_Table2_Column1', ConstraintTypes.PK, 
+                new ConstraintTarget(99, [new ConstraintColumn(1, false)]),
+                null)
             ];
 
             let referenceResolver = new MappingReferenceResolver();
             referenceResolver.resolvePrimaryKeyReferences(mapping.tables, mapping.constraints);
 
             expect(mapping.tables[0].constraints).to.have.lengthOf(0);
-            expect(mapping.constraints[0].sourceTable).to.be.null;
+            expect(mapping.constraints[0].sourceTarget.table).to.be.null;
         });
 
         it ('should set primary key references for related objects only', async function () {
@@ -126,14 +129,16 @@ describe('MappingReferenceResolver', function () {
                 new Column(1, 'column1', 'int', null, null, null, null, false, true, 1, 1, false, 1),
             ];
             mapping.constraints = [
-                new Constraint(1, 'PK_Table1_Column1', ConstraintTypes.PK, 1, [new ConstraintColumn(1, false)], null, null)
+                new Constraint(1, 'PK_Table1_Column1', ConstraintTypes.PK, 
+                new ConstraintTarget(1, [new ConstraintColumn(1, false)]),
+                null)
             ];
 
             let referenceResolver = new MappingReferenceResolver();
             referenceResolver.resolvePrimaryKeyReferences(mapping.tables, mapping.constraints);
 
             expect(mapping.tables[0].constraints).to.have.lengthOf(1);
-            expect(mapping.constraints[0].sourceTable).to.not.be.null;
+            expect(mapping.constraints[0].sourceTarget.table).to.not.be.null;
         });
     });
 });

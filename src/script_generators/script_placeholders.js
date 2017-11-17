@@ -10,7 +10,9 @@ const placeholders = {
     'PrecisionAndScale': '{PrecisionAndScale}',
     'Collate': '{Collate}',
     'ColumnMaxLength': '{ColumnMaxLength}',
-    'CreateTableBodyContent': '{CreateTableBodyContent}'
+    'CreateTableBodyContent': '{CreateTableBodyContent}',
+    'ConstraintName': '{ConstraintName}',
+    'ConstraintColumns': '{ConstraintColumns}'
 };
 
 module.exports = Object.freeze(placeholders);

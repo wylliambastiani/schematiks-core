@@ -1,16 +1,12 @@
 'use strict';
 
 
-function Constraint(id, name, type, sourceTableId, sourceColumnIds, destinationTableId, destinationColumnIds) {
+function Constraint(id, name, type, sourceTarget, destinationTarget) {
     this.id = id;
     this.name = name;
     this.type = type;
-    this.sourceTableId = sourceTableId;
-    this.sourceColumnIds = sourceColumnIds;
-    this.destinationTableId = destinationTableId;
-    this.destinationColumnIds = destinationColumnIds;
-    this.sourceTable = null;
-    this.destinationTable = null;
+    this.sourceTarget = sourceTarget;
+    this.destinationTarget = destinationTarget;
 };
 
 module.exports = Constraint;

@@ -227,9 +227,17 @@ function MSSQLServerSqlBuilder(databaseType) {
         return script;
     }
 
-    // this.generateCreateTablePrimaryKeyStmt = function(table) {
-    //     return '';
-    // }
+    this.generateCreateTablePrimaryKeyStmt = function(primaryKey) {
+        // if (!primaryKey) {
+        //     throw new Error(`Invalid primary key value: ${primaryKey}`);
+        // }
+
+        // let script = _scriptLoader.getScript('create_table_primary_key_stmt');
+
+        // for (let constraintColumn in primaryKey.sourceColumnIds) {
+
+        // }
+    }
 
     this.generateCreateTableStmt = function(table) {
         if (!table) {
