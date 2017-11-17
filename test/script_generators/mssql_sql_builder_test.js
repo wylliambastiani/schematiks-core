@@ -15,6 +15,8 @@ const Schema = require('src/models/schema');
 const Table = require('src/models/table');
 const Column = require('src/models/column');
 const Constraint = require('src/models/constraint');
+const ConstraintTarget = require('src/models/constraint_target');
+const ConstraintColumn = require('src/models/constraint_column');
 const ConstraintTypes = require('src/models/constraint_types');
 
 describe('MSSQLServerSqlBuilder', function () {
@@ -243,40 +245,80 @@ describe('MSSQLServerSqlBuilder', function () {
         });
     });
 
-    // describe('generateCreateTablePrimaryKeyStmt', function (){
-    //     it ('should return simple primary key definition for non-compound primary key', function () {
-    //         // Arrange
-    //         let builder = new MSSQLServerSqlBuilder(DatabaseTypes.MSSQL_2016);
-    //         let mapping = new DatabaseMap();
-    //         mapping.schemas = [
-    //             new Schema(1, 'dbo')
-    //         ];
-    //         mapping.tables = [
-    //             new Table(1, 'table1', new Date(), new Date(), 1)
-    //         ];
-    //         mapping.columns = [
-    //             new Column(1, 'column1', 'int', null, null, null, null, false, true, 1, 1, false, 1),
-    //         ];
-    //         mapping.constraints = [
-    //             new Constraint(1, 'PK_Table1_Column1', ConstraintTypes.PK, 1, [1], null, null)
-    //         ];
+    describe('generateCreateTablePrimaryKeyStmt', function (){
+        it ('should return simple primary key definition for non-compound primary key', function () {
+            // Arrange
+            let builder = new MSSQLServerSqlBuilder(DatabaseTypes.MSSQL_2016);
 
-    //         mapping.schemas[0].tables.push(...mapping.tables);
-    //         mapping.tables[0].schema =  mapping.schemas[0];
+            let mapping = new DatabaseMap();
+            mapping.schemas = [
+                new Schema(1, 'dbo')
+            ];
+            mapping.tables = [
+                new Table(1, 'table1', new Date(), new Date(), 1)
+            ];
+            mapping.columns = [
+                new Column(1, 'column1', 'int', null, null, null, null, false, true, 1, 1, false, 1),
+            ];
+            mapping.constraints = [
+                new Constraint(1, 'PK_Table1_Column1', ConstraintTypes.PK,
+                new ConstraintTarget(1, [new ConstraintColumn(1, false)]),
+                null)
+            ];
 
-    //         mapping.tables[0].columns.push(...mapping.columns);
-    //         mapping.columns[0].table = mapping.tables[0];
+            mapping.schemas[0].tables.push(...mapping.tables);
+            mapping.tables[0].schema =  mapping.schemas[0];
 
-    //         mapping.tables[0].constraints.push(...mapping.constraints);
-    //         mapping.constraints[0].sourceTable = mapping.tables[0];
+            mapping.tables[0].columns.push(...mapping.columns);
+            mapping.columns[0].table = mapping.tables[0];
 
-    //         // Act
-    //         let script = builder.generateCreateTablePrimaryKeyStmt(mapping.tables[0]);
+            mapping.tables[0].constraints.push(...mapping.constraints);
+            mapping.constraints[0].sourceTarget.table = mapping.tables[0];
 
-    //         // Assert
-    //         expect(script).to.contains(',CONSTRAINT [PK_Table1_Column1] PRIMARY KEY([column1] ASC)');
-    //     });
-    // });
+            // Act
+            let script = builder.generateCreateTablePrimaryKeyStmt(mapping.constraints[0]);
+
+            // Assert
+            expect(script).to.contains(',CONSTRAINT [PK_Table1_Column1] PRIMARY KEY([column1] ASC)');
+        });
+
+        it ('should return compound primary key definition for compound primary key', function () {
+            // Arrange
+            let builder = new MSSQLServerSqlBuilder(DatabaseTypes.MSSQL_2016);
+
+            let mapping = new DatabaseMap();
+            mapping.schemas = [
+                new Schema(1, 'dbo')
+            ];
+            mapping.tables = [
+                new Table(1, 'table1', new Date(), new Date(), 1)
+            ];
+            mapping.columns = [
+                new Column(1, 'column1', 'int', null, null, null, null, false, true, 1, 1, false, 1),
+                new Column(2, 'column2', 'bigint', null, null, null, null, false, false, null, null, false, 1)
+            ];
+            mapping.constraints = [
+                new Constraint(1, 'PK_Table1_Column1', ConstraintTypes.PK,
+                new ConstraintTarget(1, [new ConstraintColumn(1, false), new ConstraintColumn(2, true)]),
+                null)
+            ];
+
+            mapping.schemas[0].tables.push(...mapping.tables);
+            mapping.tables[0].schema =  mapping.schemas[0];
+
+            mapping.tables[0].columns.push(...mapping.columns);
+            mapping.columns[0].table = mapping.tables[0];
+
+            mapping.tables[0].constraints.push(...mapping.constraints);
+            mapping.constraints[0].sourceTarget.table = mapping.tables[0];
+
+            // Act
+            let script = builder.generateCreateTablePrimaryKeyStmt(mapping.constraints[0]);
+
+            // Assert
+            expect(script).to.contains(',CONSTRAINT [PK_Table1_Column1] PRIMARY KEY([column1] ASC, [column2] DESC)');
+        });
+    });
 
     describe('generateCreateTableStmt', function() {
         let createTableStmtErrorCases = [

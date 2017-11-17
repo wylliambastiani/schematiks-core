@@ -6,6 +6,7 @@ function MappingReferenceResolver() {
     this.resolveReferences = function(map) {
         this.resolveSchemaTableReferences(map.schemas, map.tables);
         this.resolveTableColumnReferences(map.tables, map.columns);
+        this.resolvePrimaryKeyReferences(map.tables, map.constraints);
     }
 
     this.resolveSchemaTableReferences = function (schemas, tables) {

@@ -5,6 +5,7 @@ require('rootpath')();
 const os = require('os');
 const ScriptLoader = require('src/script_loader');
 const ScriptPlaceholders = require('src/script_generators/script_placeholders');
+const ConstraintTypes = require('src/models/constraint_types');
 
 function MSSQLServerSqlBuilder(databaseType) {
     let _databaseType = databaseType;
@@ -228,15 +229,33 @@ function MSSQLServerSqlBuilder(databaseType) {
     }
 
     this.generateCreateTablePrimaryKeyStmt = function(primaryKey) {
-        // if (!primaryKey) {
-        //     throw new Error(`Invalid primary key value: ${primaryKey}`);
-        // }
+        if (!primaryKey) {
+            throw new Error(`Invalid primary key value: ${primaryKey}`);
+        }
 
-        // let script = _scriptLoader.getScript('create_table_primary_key_stmt');
+        let constraintColumnsScriptPart = '';
+        for (let index in primaryKey.sourceTarget.constraintColumns) {
+            let constraintColumn = primaryKey.sourceTarget.constraintColumns[index];
+            let column = primaryKey.sourceTarget.table.columns.filter(col => col.id === constraintColumn.columnId)[0];
 
-        // for (let constraintColumn in primaryKey.sourceColumnIds) {
+            let columnScriptPart = '';
 
-        // }
+            if (index > 0)
+                columnScriptPart += ', ';
+
+            if (constraintColumn.is_descending_key) 
+                columnScriptPart += `[${column.name}] DESC`;
+            else
+                columnScriptPart += `[${column.name}] ASC`;
+
+            constraintColumnsScriptPart += columnScriptPart;
+        }
+
+        let script = _scriptLoader.getScript('create_table_primary_key_stmt');
+        script = script.replace(ScriptPlaceholders.ConstraintColumns, constraintColumnsScriptPart);
+        script = script.replace(ScriptPlaceholders.ConstraintName, primaryKey.name);
+
+        return script;
     }
 
     this.generateCreateTableStmt = function(table) {
@@ -252,7 +271,7 @@ function MSSQLServerSqlBuilder(databaseType) {
         script = script.replace(ScriptPlaceholders.SchemaName, table.schema.name);
         script = script.replace(ScriptPlaceholders.TableName, table.name);
 
-        let columnsScript = '';
+        let tableContentScript = '';
         for(let index in table.columns) {
             let columnScript = this.generateCreateTableColumnStmt(table.columns[index]);
             
@@ -266,10 +285,16 @@ function MSSQLServerSqlBuilder(databaseType) {
                 columnScript = wrapInNewLine(columnScript);
             }
             
-            columnsScript += columnScript;
+            tableContentScript += columnScript;
         }
 
-        script = script.replace(ScriptPlaceholders.CreateTableBodyContent, columnsScript);
+        let primaryKeys = table.constraints.filter(constraint => { return constraint.type === ConstraintTypes.PK; });
+        if (primaryKeys.length > 0) {
+            let constraintScript = this.generateCreateTablePrimaryKeyStmt(primaryKeys[0]);
+            tableContentScript += wrapInNewLine(indentLine(constraintScript));
+        }
+
+        script = script.replace(ScriptPlaceholders.CreateTableBodyContent, tableContentScript);
 
         return wrapInNewLine(script, 2);
     };
