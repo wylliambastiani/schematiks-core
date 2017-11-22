@@ -13,26 +13,27 @@ const SqlGenerator = require('src/script_generators/sql_generator');
 const MapSerializer = require('src/utils/serializers/map_serializer');
 
 (async function() {
-    // let serializer = new MapSerializer();
-    // let oldMapJson = fs.readFileSync('output.json');
-    // let oldMap = serializer.deserialize(oldMapJson);
+    let serializer = new MapSerializer();
+    let oldMapJson = fs.readFileSync('output.json');
+    let oldMap = serializer.deserialize(oldMapJson);
     
-    let connectionSettings = new ConnectionSettings('localhost', 'TSQL2012', 'SA', 'yourStrong(!)Password', DatabaseTypes.MSSQL_2016);
-    let daoFactory = new DatabaseMapperDaoFactory(connectionSettings);
-    let dao = daoFactory.getInstance(connectionSettings);
-    let mapper = new DatabaseMapper(dao);
-    let map = await mapper.map();
+    // console.log(oldMap);
+    // let connectionSettings = new ConnectionSettings('localhost', 'TSQL2012', 'SA', 'yourStrong(!)Password', DatabaseTypes.MSSQL_2016);
+    // let daoFactory = new DatabaseMapperDaoFactory(connectionSettings);
+    // let dao = daoFactory.getInstance(connectionSettings);
+    // let mapper = new DatabaseMapper(dao);
+    // let map = await mapper.map();
 
     // let json = serializer.serialize(map);
     // fs.writeFileSync('output.json', json);
 
-    let comparer = new DatabaseMapComparer(null, map);
-    let diff = comparer.compare(); 
-    let builderFactory = new SqlBuilderFactory();
-    let builder = builderFactory.getInstance(connectionSettings.databaseType);
-    let scriptGenerator = new SqlGenerator(builder);
-    let script = scriptGenerator.generate(diff);
-    console.log(script);
+    // let comparer = new DatabaseMapComparer(null, map);
+    // let diff = comparer.compare(); 
+    // let builderFactory = new SqlBuilderFactory();
+    // let builder = builderFactory.getInstance(connectionSettings.databaseType);
+    // let scriptGenerator = new SqlGenerator(builder);
+    // let script = scriptGenerator.generate(diff);
+    // console.log(script);
     
     // for (let constraint of map.constraints) {
     //     console.log(constraint.name);

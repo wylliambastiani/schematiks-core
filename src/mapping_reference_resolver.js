@@ -1,5 +1,7 @@
 'use strict';
 
+require('rootpath')();
+
 const ConstraintTypes = require('src/models/constraint_types');
 
 function MappingReferenceResolver() {
