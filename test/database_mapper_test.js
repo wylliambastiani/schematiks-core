@@ -86,25 +86,61 @@ describe('DatabaseMapper', function () {
 
     describe ('mapPrimaryKeys', function () {
         it ('should return an empty array when no primary keys exists', async function () {
+            // Arrange
             let databaseMappingDao = {
                 getPrimaryKeys: testHelpers.createFunctionStubReturnsEmptyList()
             };
 
+            // Act
             let mapper = new DatabaseMapper(databaseMappingDao);
             let primaryKeys = await mapper.mapPrimaryKeys();
 
+            // Assert
             expect(primaryKeys).to.be.empty;
         });
 
         it ('should return a non empty array when primary keys exists', async function () {
+            // Arrange
             let databaseMappingDao = {
                 getPrimaryKeys: testHelpers.createFunctionStubReturnsNonEmptyList([new Constraint()])
             };
 
+            // Act
             let mapper = new DatabaseMapper(databaseMappingDao);
             let primaryKeys = await mapper.mapPrimaryKeys();
 
+            // Assert
             expect(primaryKeys).to.not.be.empty;
+        });
+    });
+
+    describe ('mapForeignKeys', function () {
+        it ('should return an empty array when no foreign keys exists', async function (){
+            // Arrange
+            let databaseMappingDao = {
+                getForeignKeys: testHelpers.createFunctionStubReturnsEmptyList()
+            };
+
+            // Act
+            let mapper = new DatabaseMapper(databaseMappingDao);
+            let foreignKeys = await mapper.mapForeignKeys();
+
+            // Assert
+            expect(foreignKeys).to.be.empty;
+        });
+
+        it ('should return a non empty array when foreign keys exists', async function () {
+            // Arrange
+            let databaseMappingDao = {
+                getForeignKeys: testHelpers.createFunctionStubReturnsNonEmptyList([new Constraint()])
+            };
+
+            // Act
+            let mapper = new DatabaseMapper(databaseMappingDao);
+            let foreignKeys = await mapper.mapForeignKeys();
+
+            // Assert
+            expect(foreignKeys).to.not.be.empty;
         });
     });
 });

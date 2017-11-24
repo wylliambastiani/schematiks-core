@@ -88,7 +88,7 @@ function MSSQLDatabaseMapperDao(connectionSettings) {
             return new Constraint(
                 constraint.constraint_id,
                 constraint.constraint_name,
-                constraint.constraint_type,
+                constraint.constraint_type.trim(),
                 new ConstraintTarget(constraint.table_id, [new ConstraintColumn(constraint.column_id, constraint.is_descending_key)]),
                 null
             );
@@ -101,6 +101,39 @@ function MSSQLDatabaseMapperDao(connectionSettings) {
             for (let alreadyJoinedConstraint of joinedConstraints) {
                 if (alreadyJoinedConstraint.id === constraint.id) {
                     alreadyJoinedConstraint.sourceTarget.constraintColumns.push(...constraint.sourceTarget.constraintColumns);
+                    constraintAlreadyJoined = true;
+                }
+            }
+
+            if (!constraintAlreadyJoined) {
+                joinedConstraints.push(constraint);
+            }
+        }
+
+        return joinedConstraints;
+    }
+
+    this.getForeignKeys = async function() {
+        let result = await getDatabaseObject('select_all_database_foreign_keys');
+
+        let constraints = result.recordset.map(constraint => {
+            return new Constraint(
+                constraint.constraint_id,
+                constraint.constraint_name,
+                constraint.constraint_type.trim(),
+                new ConstraintTarget(constraint.parent_table_id, [new ConstraintColumn(constraint.parent_column_id, null)]),
+                new ConstraintTarget(constraint.referenced_table_id, [new ConstraintTarget(constraint.referenced_column_id, null)])
+            );
+        });
+
+        let joinedConstraints = [];
+        for (let constraint of constraints) {
+            let constraintAlreadyJoined = false;
+
+            for (let alreadyJoinedConstraint of joinedConstraints) {
+                if (alreadyJoinedConstraint.id === constraint.id) {
+                    alreadyJoinedConstraint.sourceTarget.constraintColumns.push(...constraint.sourceTarget.constraintColumns);
+                    alreadyJoinedConstraint.destinationTarget.constraintColumns.push(...constraint.destinationTarget.constraintColumns);
                     constraintAlreadyJoined = true;
                 }
             }

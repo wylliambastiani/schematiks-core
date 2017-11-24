@@ -9,29 +9,7 @@ FROM Sales.OrderDetails
 
 
 
-SELECT
-	COL.[column_id] AS [column_id]
-	,COL.[name] AS [column_name]
-	,TP.[name] AS [column_type]
-	,COL.[max_length] AS [column_max_length]
-	,COL.[precision] AS [column_precision]
-	,COL.[scale] AS [column_scale]
-	,COL.[collation_name] AS [column_collation_name]
-	,COL.[is_nullable] AS [columns_is_nullable]
-	,COL.[is_identity] AS [column_is_identity]
-	,IC.[seed_value] AS [column_identity_seed_value]
-	,IC.[increment_value] AS [column_identity_increment_value]
-	,COL.[is_computed] AS [column_is_computed]
-	,TAB.[object_id] AS [table_id]
-FROM TSQL2012.sys.tables AS TAB
-	INNER JOIN TSQL2012.sys.columns AS COL ON COL.[object_id] = TAB.[object_id]
-	INNER JOIN TSQL2012.sys.types AS TP ON TP.[user_type_id] = COL.[user_type_id]
-	LEFT JOIN TSQL2012.sys.identity_columns as IC ON IC.[object_id] = TAB.[object_id]
-WHERE
-	TAB.[type] = N'U'
-ORDER BY
-	TAB.[object_id] ASC
-	,COL.[column_id] ASC;
+
 
 SELECT * FROM sys.index_columns  WHERE object_id = 901578250
 SELECT * FROM sys.indexes WHERE object_id = 901578250
@@ -54,9 +32,39 @@ WHERE
     TAB.[type] = N'U'
 	AND KC.[type] = N'PK'
 
--- SELECT ', [' + c.name + '] ' + CASE WHEN ic.is_descending_key = 1 THEN 'DESC' ELSE 'ASC' END
--- FROM sys.index_columns ic WITH (NOWAIT)
---     JOIN sys.columns c WITH (NOWAIT) ON c.[object_id] = ic.[object_id] AND c.column_id = ic.column_id
--- WHERE ic.is_included_column = 0
---     AND ic.[object_id] = k.parent_object_id 
---     AND ic.index_id = k.unique_index_id     
+
+SELECT
+	FK.object_id AS [constraint_id]
+	,FK.name AS [constraint_name]
+	,FK.parent_object_id AS [parent_table_id]
+	,FKC.parent_column_id AS [parent_column_id]
+	,FK.referenced_object_id AS [referenced_object_id]
+	,FKC.referenced_column_id AS [referenced_column_id]
+FROM sys.foreign_keys AS FK
+	INNER JOIN sys.foreign_key_columns AS FKC ON FKC.constraint_object_id = FK.object_id;
+
+SELECT *
+FROM sys.foreign_key_columns 
+
+SELECT *
+FROM sys.foreign_keys 
+
+drop table TestCompoundFK1;
+drop table TestCompoundFK2;
+
+CREATE TABLE dbo.TestCompoundFK1
+(
+	id int,
+	otoid int,
+	CONSTRAINT PKFK12 PRIMARY KEY (id, otoid)
+)
+
+
+CREATE TABLE dbo.TestCompoundFK2
+(
+	id int,
+	otoid int,
+	FOREIGN KEY (id, otoid) REFERENCES TestCompoundFK1(id, otoid)
+)
+
+SELECT * FROM sys.objects WHERE object_id = 194099732

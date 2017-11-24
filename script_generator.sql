@@ -1,3 +1,5 @@
+
+
 DECLARE @table_name SYSNAME
 SELECT @table_name = 'Stats.Tests'
 
@@ -26,7 +28,7 @@ DECLARE @SQL NVARCHAR(MAX) = ''
         , c.name
     FROM sys.index_columns ic WITH (NOWAIT)
     JOIN sys.columns c WITH (NOWAIT) ON ic.[object_id] = c.[object_id] AND ic.column_id = c.column_id
-    WHERE ic.[object_id] = @object_id
+    WHERE ic.[object_id] =    @object_id
 ),
 fk_columns AS 
 (

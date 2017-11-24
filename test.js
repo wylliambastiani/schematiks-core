@@ -1,4 +1,4 @@
-
+23/11
 require('rootpath')();
 
 const fs = require('fs');
@@ -14,15 +14,15 @@ const MapSerializer = require('src/utils/serializers/map_serializer');
 
 (async function() {
     let serializer = new MapSerializer();
-    let oldMapJson = fs.readFileSync('output.json');
-    let oldMap = serializer.deserialize(oldMapJson);
+    // let oldMapJson = fs.readFileSync('output.json');
+    // let oldMap = serializer.deserialize(oldMapJson);
     
     // console.log(oldMap);
-    // let connectionSettings = new ConnectionSettings('localhost', 'TSQL2012', 'SA', 'yourStrong(!)Password', DatabaseTypes.MSSQL_2016);
-    // let daoFactory = new DatabaseMapperDaoFactory(connectionSettings);
-    // let dao = daoFactory.getInstance(connectionSettings);
-    // let mapper = new DatabaseMapper(dao);
-    // let map = await mapper.map();
+    let connectionSettings = new ConnectionSettings('localhost', 'TSQL2012', 'SA', 'yourStrong(!)Password', DatabaseTypes.MSSQL_2016);
+    let daoFactory = new DatabaseMapperDaoFactory(connectionSettings);
+    let dao = daoFactory.getInstance(connectionSettings);
+    let mapper = new DatabaseMapper(dao);
+    let map = await mapper.map();
 
     // let json = serializer.serialize(map);
     // fs.writeFileSync('output.json', json);
@@ -35,10 +35,11 @@ const MapSerializer = require('src/utils/serializers/map_serializer');
     // let script = scriptGenerator.generate(diff);
     // console.log(script);
     
-    // for (let constraint of map.constraints) {
-    //     console.log(constraint.name);
-    //     for (let sourceColumn of constraint.sourceTarget.constraintColumns) {
-    //         console.log('\t' + sourceColumn.columnId + ' - ' + sourceColumn.is_descending_key);
-    //     }
-    // }
+    let fks = map.constraints.filter(constraint => { return constraint.type === 'F'; });
+    for (let constraint of fks) {
+        console.log('[' + constraint.type + '] ' + constraint.name);
+        for (let sourceColumn of constraint.sourceTarget.constraintColumns) {
+            console.log('\t' + sourceColumn.columnId + ' - ' + sourceColumn.is_descending_key);
+        }
+    }
 })();
