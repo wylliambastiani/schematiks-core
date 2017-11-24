@@ -1,7 +1,8 @@
 'use strict';
 
 const types = {
-    'PK': 'PK'
+    'PK': 'PrimaryKey',
+    'FK': 'ForeignKey'
 };
 
 module.exports = Object.freeze(types);
