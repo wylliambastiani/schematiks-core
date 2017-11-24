@@ -258,6 +258,16 @@ function MSSQLServerSqlBuilder(databaseType) {
         return script;
     }
 
+    this.generateCreateTableForeignKeyStmt = function(foreignKey) {
+        if (!foreignKey) {
+            throw new Error(`Invalid foreign key value: ${foreignKey}`);
+        }
+    
+        
+
+        return '';
+    }
+
     this.generateCreateTableStmt = function(table) {
         if (!table) {
             throw new Error(`Invalid table value: ${table}`);

@@ -172,7 +172,7 @@ describe('MappingReferenceResolver', function () {
                 new Column(1, 'column_table2', 'int',  null, null, null, null, false, true, 1, 1, false, 1)
             ];
             mapping.constraints = [
-                new Constraint(1, 'PF_Table2_Table1', ConstraintTypes.PK, 
+                new Constraint(1, 'PF_Table2_Table1', ConstraintTypes.FK, 
                 new ConstraintTarget(98, [new ConstraintColumn(1, null)]), 
                 new ConstraintTarget(99, [new ConstraintColumn(1, null)]))
             ];
@@ -195,7 +195,7 @@ describe('MappingReferenceResolver', function () {
             ];
             mapping.columns = [
                 new Column(1, 'column1_table1', 'int', null, null, null, null, false, true, 1, 1, false, 1),
-                new Column(1, 'column_table2', 'int',  null, null, null, null, false, true, 1, 1, false, 1)
+                new Column(1, 'column_table2', 'int',  null, null, null, null, false, true, 1, 1, false, 2)
             ];
             mapping.constraints = [
                 new Constraint(1, 'PF_Table2_Table1', ConstraintTypes.FK, 

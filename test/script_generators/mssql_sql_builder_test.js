@@ -320,6 +320,37 @@ describe('MSSQLServerSqlBuilder', function () {
         });
     });
 
+    describe('generateCreateTableForeignKeyStmt', function (){
+        it ('should return simple foreign key definition for non-compound foreign key', function () {
+            // Arrange
+            let builder = new MSSQLServerSqlBuilder(DatabaseTypes.MSSQL_2016);
+            
+            let mapping = new DatabaseMap();
+            mapping.schemas = [
+                new Schema(1, 'dbo')
+            ];
+            mapping.tables = [
+                new Table(1, 'table1', new Date(), new Date(), 1),
+                new Table(2, 'table2', new Date(), new Date(), 1),
+            ];
+            mapping.columns = [
+                new Column(1, 'column1', 'int', null, null, null, null, false, true, 1, 1, false, 1),
+                new Column(1, 'column2', 'int', null, null, null, null, false, true, 1, 1, false, 2)
+            ];
+            mapping.constraints = [
+                new Constraint(1, 'FK_Table_Table1', ConstraintTypes.FK,
+                new ConstraintTarget(2, [new ConstraintColumn(1, null)]),
+                new ConstraintTarget(1, [new ConstraintColumn(1, null)]),)
+            ];
+
+            // Act
+            let script = builder.generateCreateTableForeignKeyStmt(mapping.constraints[0]);
+
+            // Assert
+            expect(script).to.contains(',CONSTRAINT [FK_Table_Table1] FOREIGN KEY (column2) REFERENCES dbo.table1 (column1)');
+        });
+    });
+
     describe('generateCreateTableStmt', function() {
         let createTableStmtErrorCases = [
             {args: null},
