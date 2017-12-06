@@ -12,6 +12,7 @@ const Column = require('src/models/column');
 const Constraint = require('src/models/constraint');
 const ConstraintColumn = require('src/models/constraint_column');
 const ConstraintTarget = require('src/models/constraint_target');
+const ConstraintTypes = require('src/models/constraint_types');
 
 function MSSQLDatabaseMapperDao(connectionSettings) {
     let _connectionSettings = connectionSettings;
@@ -88,7 +89,7 @@ function MSSQLDatabaseMapperDao(connectionSettings) {
             return new Constraint(
                 constraint.constraint_id,
                 constraint.constraint_name,
-                constraint.constraint_type.trim(),
+                ConstraintTypes.PK,
                 new ConstraintTarget(constraint.table_id, [new ConstraintColumn(constraint.column_id, constraint.is_descending_key)]),
                 null
             );
@@ -120,9 +121,9 @@ function MSSQLDatabaseMapperDao(connectionSettings) {
             return new Constraint(
                 constraint.constraint_id,
                 constraint.constraint_name,
-                constraint.constraint_type.trim(),
+                ConstraintTypes.FK,
                 new ConstraintTarget(constraint.parent_table_id, [new ConstraintColumn(constraint.parent_column_id, null)]),
-                new ConstraintTarget(constraint.referenced_table_id, [new ConstraintTarget(constraint.referenced_column_id, null)])
+                new ConstraintTarget(constraint.referenced_table_id, [new ConstraintColumn(constraint.referenced_column_id, null)])
             );
         });
 

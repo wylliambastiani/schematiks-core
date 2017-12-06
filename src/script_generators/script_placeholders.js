@@ -12,7 +12,10 @@ const placeholders = {
     'ColumnMaxLength': '{ColumnMaxLength}',
     'CreateTableBodyContent': '{CreateTableBodyContent}',
     'ConstraintName': '{ConstraintName}',
-    'ConstraintColumns': '{ConstraintColumns}'
+    'ConstraintColumns': '{ConstraintColumns}',
+    'ConstraintParentColumns': '{ConstraintParentColumns}',
+    'ConstraintReferencedTable': '{ConstraintReferencedTable}',
+    'ConstraintReferencedColumns': '{ConstraintReferencedColumns}'
 };
 
 module.exports = Object.freeze(placeholders);

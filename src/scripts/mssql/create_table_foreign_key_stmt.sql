@@ -1,1 +1,1 @@
-,CONSTRAINT [{ConstraintName}] PRIMARY KEY({ConstraintParentColumns}) REFERENCES {ConstraintReferencedTable}({ConstraintReferencedColumns})
+,CONSTRAINT [{ConstraintName}] FOREIGN KEY ({ConstraintParentColumns}) REFERENCES {ConstraintReferencedTable} ({ConstraintReferencedColumns})

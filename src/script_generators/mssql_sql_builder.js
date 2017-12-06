@@ -263,9 +263,43 @@ function MSSQLServerSqlBuilder(databaseType) {
             throw new Error(`Invalid foreign key value: ${foreignKey}`);
         }
     
-        
+        let targetTable = foreignKey.destinationTarget.table.schema.name + '.' + foreignKey.destinationTarget.table.name;
 
-        return '';
+        let constraintSourceColumnsScriptPart = '';
+        for (let index in foreignKey.sourceTarget.constraintColumns) {
+            let constraintColumn = foreignKey.sourceTarget.constraintColumns[index];
+            let column = foreignKey.sourceTarget.table.columns.filter(col => col.id === constraintColumn.columnId)[0];
+
+            let sourceColumnScriptPart = '';
+
+            if (index > 0) 
+                sourceColumnScriptPart += ', ';
+
+            sourceColumnScriptPart += `[${column.name}]`;
+            constraintSourceColumnsScriptPart += sourceColumnScriptPart;
+        } 
+
+        let constraintDestinationColumnsScriptPart = '';
+        for (let index in foreignKey.destinationTarget.constraintColumns) {
+            let constraintColumn = foreignKey.destinationTarget.constraintColumns[index];
+            let column = foreignKey.destinationTarget.table.columns.filter(col => col.id === constraintColumn.columnId)[0];
+
+            let destinationColumnScriptPart = '';
+
+            if (index > 0)
+                destinationColumnScriptPart += ', ';
+
+            destinationColumnScriptPart += `[${column.name}]`;
+            constraintDestinationColumnsScriptPart += destinationColumnScriptPart;
+        }
+
+        let script = _scriptLoader.getScript('create_table_foreign_key_stmt');
+        script = script.replace(ScriptPlaceholders.ConstraintName, foreignKey.name);
+        script = script.replace(ScriptPlaceholders.ConstraintParentColumns, constraintSourceColumnsScriptPart);
+        script = script.replace(ScriptPlaceholders.ConstraintReferencedTable, targetTable);
+        script = script.replace(ScriptPlaceholders.ConstraintReferencedColumns, constraintDestinationColumnsScriptPart);
+
+        return script;
     }
 
     this.generateCreateTableStmt = function(table) {
@@ -301,6 +335,12 @@ function MSSQLServerSqlBuilder(databaseType) {
         let primaryKeys = table.constraints.filter(constraint => { return constraint.type === ConstraintTypes.PK; });
         if (primaryKeys.length > 0) {
             let constraintScript = this.generateCreateTablePrimaryKeyStmt(primaryKeys[0]);
+            tableContentScript += wrapInNewLine(indentLine(constraintScript));
+        }
+
+        let foreignKeys = table.constraints.filter(constraint => { return constraint.type === ConstraintTypes.FK; });
+        for (let foreignKey of foreignKeys) {
+            let constraintScript = this.generateCreateTableForeignKeyStmt(foreignKey);
             tableContentScript += wrapInNewLine(indentLine(constraintScript));
         }
 

@@ -343,11 +343,27 @@ describe('MSSQLServerSqlBuilder', function () {
                 new ConstraintTarget(1, [new ConstraintColumn(1, null)]),)
             ];
 
+            mapping.schemas[0].tables = mapping.tables;
+            mapping.tables[0].schema = mapping.schemas[0];
+            mapping.tables[1].schema = mapping.schemas[0];
+
+            mapping.tables[0].columns = [mapping.columns[0]];
+            mapping.columns[0].table = mapping.tables[0];
+
+            mapping.tables[1].columns = [mapping.columns[1]];
+            mapping.columns[1].table = mapping.tables[1];
+
+            mapping.tables[0].constraints = mapping.constraints;
+            mapping.tables[1].constraints = mapping.constraints;
+
+            mapping.constraints[0].sourceTarget.table = mapping.tables[1];
+            mapping.constraints[0].destinationTarget.table = mapping.tables[0];
+
             // Act
             let script = builder.generateCreateTableForeignKeyStmt(mapping.constraints[0]);
 
             // Assert
-            expect(script).to.contains(',CONSTRAINT [FK_Table_Table1] FOREIGN KEY (column2) REFERENCES dbo.table1 (column1)');
+            expect(script).to.contains(',CONSTRAINT [FK_Table_Table1] FOREIGN KEY ([column2]) REFERENCES dbo.table1 ([column1])');
         });
     });
 
