@@ -178,6 +178,12 @@ function MSSQLServerSqlBuilder(databaseType) {
         return wrapInNewLine(script, 2);
     }
 
+    this.generateCreateDatabaseStmt = function(databaseName) {
+        if (!databaseName) {
+            throw new Error(`Invalid database name: ${databaseName}`);
+        }
+    }
+
     this.generateDropSchemaStmt = function(schema) {
         if (!schema) {
             throw new Error(`Invalid schema value: ${schema}`);

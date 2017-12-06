@@ -41,13 +41,33 @@ describe('MSSQLServerSqlBuilder', function () {
         ];
 
         createUseStmtErrorCases.forEach(function(testCase) {
-            it(`should throw error if database name is ${testCase.args}`, function() {
+            it(`should throw error if database name is ${testCase.args}`, function () {
                 // Arrange
                 let builder = new MSSQLServerSqlBuilder(DatabaseTypes.MSSQL_2016);
     
                 // Act + Assert
-                let fun = function() { builder.generateUseStmt(testCase.args); };
-                expect(fun).to.throw(Error);
+                let fun = function () { builder.generateUseStmt(testCase.args); };
+                expect(fun).to.throw(Error, `Invalid database name: ${testCase.args}`);
+            });
+        });
+    });
+
+    describe('generateCreateDatabaseStmt', function () {
+
+        let createDatabaseStmtErrorCases = [
+            {args: ''},
+            {args: null},
+            {args: undefined}
+        ];
+
+        createDatabaseStmtErrorCases.forEach(function(testCase) {
+            it (`should throw error if database name is ${testCase.args}`, function () {
+                // Arrange
+                let builder = new MSSQLServerSqlBuilder(DatabaseTypes.MSSQL_2016);
+
+                // Act + Assert
+                let fun = function () { builder.generateCreateDatabaseStmt(testCase.args); };
+                expect(fun).to.throw(Error, `Invalid database name: ${testCase.args}`);
             });
         });
     });
