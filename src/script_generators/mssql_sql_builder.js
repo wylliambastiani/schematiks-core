@@ -175,7 +175,7 @@ function MSSQLServerSqlBuilder(databaseType) {
         let script = _scriptLoader.getScript('use_stmt');
         script = script.replace(ScriptPlaceholders.DatabaseName, databaseName);
 
-        return wrapInNewLine(script);
+        return wrapInNewLine(script, 2);
     }
 
     this.generateDropSchemaStmt = function(schema) {
@@ -355,6 +355,7 @@ function MSSQLServerSqlBuilder(databaseType) {
         let databaseName = diff.currentDatabaseMap.databaseName || diff.previousDatabaseMap.databaseName;
 
         // use statement
+        script += this.generateUseStmt('master');
         script += this.generateUseStmt(databaseName);
 
         // drop tables
