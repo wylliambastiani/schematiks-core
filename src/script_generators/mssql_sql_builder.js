@@ -6,6 +6,7 @@ const os = require('os');
 const ScriptLoader = require('src/script_loader');
 const ScriptPlaceholders = require('src/script_generators/script_placeholders');
 const ConstraintTypes = require('src/models/constraint_types');
+let DatabaseObjectDiffState = require('src/models/database_object_diff_state');
 
 function MSSQLServerSqlBuilder(databaseType) {
     let _databaseType = databaseType;
@@ -348,6 +349,32 @@ function MSSQLServerSqlBuilder(databaseType) {
 
         return wrapInNewLine(script, 2);
     };
+
+    this.generateScript = function (diff) {
+        let script = '';
+        let databaseName = diff.currentDatabaseMap.databaseName || diff.previousDatabaseMap.databaseName;
+
+        // use statement
+        script += this.generateUseStmt(databaseName);
+
+        // drop tables
+        let tablesToDrop = diff.tablesDiff.filter(tableDiff => { return tableDiff.diffState === DatabaseObjectDiffState.DELETED; });
+        tablesToDrop.forEach(tableToDrop => { script += this.generateDropTableStmt(tableToDrop.previousObjectVersion); });
+
+        // drop schemas
+        let schemasToDrop = diff.schemasDiff.filter(schemaDiff => { return schemaDiff.diffState === DatabaseObjectDiffState.DELETED; });
+        schemasToDrop.forEach(schemaToDrop => { script += this.generateDropSchemaStmt(schemaToDrop.previousObjectVersion); })
+        
+        // creates schemas
+        let schemasToCreate = diff.schemasDiff.filter(schemaDiff => { return schemaDiff.diffState === DatabaseObjectDiffState.CREATED; });
+        schemasToCreate.forEach(schemaToCreate => { script += this.generateCreateSchemaStmt(schemaToCreate.currentObjectVersion); });
+
+        // create tables
+        let tablesToCreate = diff.tablesDiff.filter(tableDiff => { return tableDiff.diffState === DatabaseObjectDiffState.CREATED; });
+        tablesToCreate.forEach(tableToCreate => { script += this.generateCreateTableStmt(tableToCreate.currentObjectVersion); })
+
+        return script;
+    }
 }
 
 module.exports = MSSQLServerSqlBuilder;
