@@ -6,7 +6,7 @@ const os = require('os');
 const ScriptLoader = require('src/script_loader');
 const ScriptPlaceholders = require('src/script_generators/script_placeholders');
 const ConstraintTypes = require('src/models/constraint_types');
-let DatabaseObjectDiffState = require('src/models/database_object_diff_state');
+const DatabaseObjectDiffState = require('src/models/database_object_diff_state');
 
 function MSSQLServerSqlBuilder(databaseType) {
     let _databaseType = databaseType;
@@ -182,6 +182,11 @@ function MSSQLServerSqlBuilder(databaseType) {
         if (!databaseName) {
             throw new Error(`Invalid database name: ${databaseName}`);
         }
+
+        let script = _scriptLoader.getScript('create_database_stmt');
+        script = script.replace(new RegExp(ScriptPlaceholders.DatabaseName, 'g'), databaseName);
+
+        return script;
     }
 
     this.generateDropSchemaStmt = function(schema) {

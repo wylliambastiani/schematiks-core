@@ -70,6 +70,21 @@ describe('MSSQLServerSqlBuilder', function () {
                 expect(fun).to.throw(Error, `Invalid database name: ${testCase.args}`);
             });
         });
+
+        it ('should return \'create database\' statement', function () {
+            // Arrange
+            let builder = new MSSQLServerSqlBuilder(DatabaseTypes.MSSQL_2016);
+            let databaseName = 'TestDB';
+
+            // Act
+            let script = builder.generateCreateDatabaseStmt(databaseName);
+
+            // Assert
+            expect(script).to.contains(`IF NOT EXISTS (SELECT * FROM sys.databases WHERE [name] = ${databaseName})`);
+            expect(script).to.contains('BEGIN');
+            expect(script).to.contains(`    CREATE DATABASE ${databaseName};`);
+            expect(script).to.contains('END;');
+        });
     });
 
     describe('generateDropTableStmt', function() {
