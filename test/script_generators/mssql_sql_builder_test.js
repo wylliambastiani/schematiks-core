@@ -80,7 +80,7 @@ describe('MSSQLServerSqlBuilder', function () {
             let script = builder.generateCreateDatabaseStmt(databaseName);
 
             // Assert
-            expect(script).to.contains(`IF NOT EXISTS (SELECT * FROM sys.databases WHERE [name] = ${databaseName})`);
+            expect(script).to.contains(`IF NOT EXISTS (SELECT * FROM sys.databases WHERE [name] = '${databaseName}')`);
             expect(script).to.contains('BEGIN');
             expect(script).to.contains(`    CREATE DATABASE ${databaseName};`);
             expect(script).to.contains('END;');

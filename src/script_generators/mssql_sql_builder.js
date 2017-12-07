@@ -186,7 +186,7 @@ function MSSQLServerSqlBuilder(databaseType) {
         let script = _scriptLoader.getScript('create_database_stmt');
         script = script.replace(new RegExp(ScriptPlaceholders.DatabaseName, 'g'), databaseName);
 
-        return script;
+        return wrapInNewLine(script, 2);
     }
 
     this.generateDropSchemaStmt = function(schema) {
@@ -367,23 +367,42 @@ function MSSQLServerSqlBuilder(databaseType) {
 
         // use statement
         script += this.generateUseStmt('master');
+        script += this.generateCreateDatabaseStmt(databaseName);
         script += this.generateUseStmt(databaseName);
 
         // drop tables
-        let tablesToDrop = diff.tablesDiff.filter(tableDiff => { return tableDiff.diffState === DatabaseObjectDiffState.DELETED; });
-        tablesToDrop.forEach(tableToDrop => { script += this.generateDropTableStmt(tableToDrop.previousObjectVersion); });
+        let tablesToDrop = diff.tablesDiff.filter(tableDiff => { 
+            return tableDiff.diffState === DatabaseObjectDiffState.DELETED; 
+        });
+
+        tablesToDrop.forEach(tableToDrop => {
+             script += this.generateDropTableStmt(tableToDrop.previousObjectVersion); 
+        });
 
         // drop schemas
-        let schemasToDrop = diff.schemasDiff.filter(schemaDiff => { return schemaDiff.diffState === DatabaseObjectDiffState.DELETED; });
-        schemasToDrop.forEach(schemaToDrop => { script += this.generateDropSchemaStmt(schemaToDrop.previousObjectVersion); })
+        let schemasToDrop = diff.schemasDiff.filter(schemaDiff => { 
+            return schemaDiff.diffState === DatabaseObjectDiffState.DELETED; 
+        });
+        schemasToDrop.forEach(schemaToDrop => { 
+            script += this.generateDropSchemaStmt(schemaToDrop.previousObjectVersion); 
+        });
         
         // creates schemas
-        let schemasToCreate = diff.schemasDiff.filter(schemaDiff => { return schemaDiff.diffState === DatabaseObjectDiffState.CREATED; });
-        schemasToCreate.forEach(schemaToCreate => { script += this.generateCreateSchemaStmt(schemaToCreate.currentObjectVersion); });
+        let schemasToCreate = diff.schemasDiff.filter(schemaDiff => { 
+            return schemaDiff.currentObjectVersion.name != 'dbo' && schemaDiff.diffState === DatabaseObjectDiffState.CREATED ; 
+        });
+
+        schemasToCreate.forEach(schemaToCreate => { 
+            script += this.generateCreateSchemaStmt(schemaToCreate.currentObjectVersion); 
+        });
 
         // create tables
-        let tablesToCreate = diff.tablesDiff.filter(tableDiff => { return tableDiff.diffState === DatabaseObjectDiffState.CREATED; });
-        tablesToCreate.forEach(tableToCreate => { script += this.generateCreateTableStmt(tableToCreate.currentObjectVersion); })
+        let tablesToCreate = diff.tablesDiff.filter(tableDiff => { 
+            return tableDiff.diffState === DatabaseObjectDiffState.CREATED; 
+        });
+        tablesToCreate.forEach(tableToCreate => {
+            script += this.generateCreateTableStmt(tableToCreate.currentObjectVersion); 
+        });
 
         return script;
     }
