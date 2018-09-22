@@ -288,7 +288,6 @@ function DatabaseMapComparer (previousDatabaseMap, currentDatabaseMap) {
         return diffs;
     }
 
-
     function compareTables() {
         if (_previousDatabaseMap.tables.length === 0 && _currentDatabaseMap.tables.length === 0)
             return;

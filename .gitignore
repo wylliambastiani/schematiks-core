@@ -59,6 +59,7 @@ typings/
 
 
 
+.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json

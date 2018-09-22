@@ -2,13 +2,8 @@
 
 require('rootpath')();
 
-const mocha = require('mocha');
 const expect = require('chai').expect;
-const testHelpers = require('test/test_helpers');
 const DatabaseMap = require('src/models/database_map');
-const DatabaseMapDiff = require('src/models/database_map_diff');
-const DatabaseObjectDiff = require('src/models/database_object_diff');
-const DatabaseObjectDiffState = require('src/models/database_object_diff_state');
 const DatabaseTypes = require('src/models/database_types');
 const MSSQLServerSqlBuilder = require('src/script_generators/mssql_sql_builder');
 const Schema = require('src/models/schema');
@@ -373,9 +368,13 @@ describe('MSSQLServerSqlBuilder', function () {
                 new Column(1, 'column2', 'int', null, null, null, null, false, true, 1, 1, false, 2)
             ];
             mapping.constraints = [
-                new Constraint(1, 'FK_Table_Table1', ConstraintTypes.FK,
-                new ConstraintTarget(2, [new ConstraintColumn(1, null)]),
-                new ConstraintTarget(1, [new ConstraintColumn(1, null)]),)
+                new Constraint(
+                    1, 
+                    'FK_Table_Table1', 
+                    ConstraintTypes.FK,
+                    new ConstraintTarget(2, [new ConstraintColumn(1, null)]),
+                    new ConstraintTarget(1, [new ConstraintColumn(1, null)]),
+                )
             ];
 
             mapping.schemas[0].tables = mapping.tables;
@@ -399,6 +398,64 @@ describe('MSSQLServerSqlBuilder', function () {
 
             // Assert
             expect(script).to.contains(',CONSTRAINT [FK_Table_Table1] FOREIGN KEY ([column2]) REFERENCES dbo.table1 ([column1])');
+        });
+
+        it ('should return compound foreign key definition for compound foreign key', function () {
+
+            // Arrange
+            let builder = new MSSQLServerSqlBuilder(DatabaseTypes.MSSQL_2016);
+
+            let mapping = new DatabaseMap();
+            
+            mapping.schemas = [
+                new Schema(1, 'dbo')
+            ];
+            mapping.tables = [
+                new Table(1, 'table1', new Date(), new Date(), 1),
+                new Table(2, 'table2', new Date(), new Date(), 1),
+            ];
+            mapping.columns = [ 
+                new Column(1, 'columnSource1', 'int', null, null, null, null, false, true, 1, 1, false, 1),
+                new Column(2, 'columnSource2', 'int', null, null, null, null, false, true, 1, 1, false, 1),
+                new Column(1, 'columnTarget1', 'int', null, null, null, null, false, true, 1, 1, false, 2),
+                new Column(2, 'columnTarget2', 'int', null, null, null, null, false, true, 1, 1, false, 2),
+            ];
+            mapping.constraints = [
+                new Constraint(
+                    1,
+                    'FK_Table1_Table2_Compound',
+                    ConstraintTypes.FK,
+                    new ConstraintTarget(1, [
+                        new ConstraintColumn(1, null),
+                        new ConstraintColumn(2, null),
+                    ]),
+                    new ConstraintTarget(2, [
+                        new ConstraintColumn(1, null),
+                        new ConstraintColumn(2, null),
+                    ])
+                )
+            ];
+
+            mapping.schemas[0].ables = mapping.tables;
+            mapping.tables[0].schema = mapping.schemas[0];
+            mapping.tables[1].schema = mapping.schemas[0];
+
+            mapping.tables[0].columns = [mapping.columns[0], mapping.columns[1]];
+            mapping.columns[0].table = mapping.tables[0];
+            mapping.columns[1].table = mapping.tables[0];
+
+            mapping.tables[1].columns = [mapping.columns[2], mapping.columns[3]];
+            mapping.columns[2].table = mapping.tables[1];
+            mapping.columns[3].table = mapping.tables[1];
+
+            mapping.constraints[0].sourceTarget.table = mapping.tables[0];
+            mapping.constraints[0].destinationTarget.table = mapping.tables[1];
+
+            // Act
+            let script = builder.generateCreateTableForeignKeyStmt(mapping.constraints[0]);
+
+            // Assert
+            expect(script).to.contains(',CONSTRAINT [FK_Table1_Table2_Compound] FOREIGN KEY ([columnSource1], [columnSource2]) REFERENCES dbo.table2 ([columnTarget1], [columnTarget2])');
         });
     });
 
