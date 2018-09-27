@@ -44,7 +44,9 @@ function MSSQLDatabaseMapperDao(connectionSettings) {
             throw new Error(err);
         }
         finally {
-            pool.close();
+            if (pool) {
+                pool.close();
+            }
         }
     };
 
