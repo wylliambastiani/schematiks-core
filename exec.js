@@ -1,18 +1,18 @@
 'use strict';
 
-const DatabaseType = require('./src/models/database_types');
-const ConnectionSettings = require('./src/dao/connection_settings');
-const DatabaseMapperDaoFactory = require('./src/dao/database_mapper_dao_factory');
-const DatabaseMapper = require('./src/database_mapper');
-const DatabaseMapComparer = require('./src/database_map_comparer');
-const SqlBuilderFactory = require('./src/script_generators/sql_builder_factory');
+const { 
+    DatabaseType,
+    ConnectionSettings,
+    DatabaseMapperDaoFactory,
+    DatabaseMapper,
+    DatabaseMapComparer,
+    SqlBuilderFactory   
+ } = require('./src');
 
 function createDatabaseMapperDao (connectionSettings) {
     const daoFactory = new DatabaseMapperDaoFactory();
     return daoFactory.getInstance(connectionSettings);
 }
-
-
 
 (async () => {
 
