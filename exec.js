@@ -15,7 +15,7 @@ const {
     'localhost',
     'TSQL2012',
     'SA',
-    'yourStrong(!)Password',
+    '<YourStrong!Passw0rd>',
     DatabaseType.MSSQL_2016
   );
 
