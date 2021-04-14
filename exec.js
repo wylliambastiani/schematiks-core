@@ -15,14 +15,13 @@ const {
     'localhost',
     'TSQL2012',
     'SA',
-    '<YourStrong!Passw0rd>',
+    '<YourStrongPassw0rd>',
     DatabaseType.MSSQL_2016
   );
 
   const mapper = new DatabaseMapper({ connectionSettings });
   const map = await mapper.map();
 
-  console.log(map);
   const mapComparer = new DatabaseMapComparer(null, map);
   const diff = mapComparer.compare();
 
@@ -30,4 +29,5 @@ const {
   const sqlScriptBuilder = sqlScriptBuilderFactory.getInstance(connectionSettings.databaseType);
 
   const script = sqlScriptBuilder.generateScript(diff);
+  console.log(script)
 })();
