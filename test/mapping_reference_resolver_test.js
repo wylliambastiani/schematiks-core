@@ -21,8 +21,10 @@ describe('MappingReferenceResolver', function () {
   describe('resolveSchemaTableReferences', function () {
     
     it('should set no object reference for not related objects', async function () {
+
       // Arrange
-      let mapping = new DatabaseMap();
+      const mapping = new DatabaseMap();
+
       mapping.schemas = [
         new Schema(1, 'dbo')
       ];
